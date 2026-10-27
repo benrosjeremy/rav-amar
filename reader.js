@@ -71,12 +71,13 @@ async function archive(){
 }
 /* ---------- videos by parasha ---------- */
 async function pfilter(){
- const el=document.getElementById('pfil');if(!el)return;await load(['pidx','thumbs']);const P=D.pidx,T=D.thumbs||{};let cur=null;
- el.innerHTML=`<div class="pf"><h2>שיעורים לפי פרשת השבוע</h2><p>בחרו פרשה וראו את כל השיעורים והדרשות עליה בערוץ.</p>`+P.order.map(([ch,ns])=>`<div class="pfr"><b>ספר ${ch}</b><div>${ns.map(n=>`<button class="chip" data-p="${n}">${n} <small>${P.map[n].length}</small></button>`).join('')}</div></div>`).join('')+`</div><div id="pres"></div>`;
+ const el=document.getElementById('pfil');if(!el)return;await load(['pidx','thumbs']);const P=D.pidx,T=D.thumbs||{};
+ const groups=P.order.map(([ch,ns])=>`<optgroup label="ספר ${ch}">${ns.map(n=>`<option value="${esc(n)}">${esc(n)} (${P.map[n].length})</option>`).join('')}</optgroup>`).join('');
+ el.innerHTML=`<div class="pf"><h2>שיעורים לפי פרשת השבוע</h2><p>בחרו פרשה וראו את כל השיעורים והדרשות עליה בערוץ.</p><select id="psel"><option value="">בחרו פרשה…</option>${groups}</select></div><div id="pres"></div>`;
  const res=el.querySelector('#pres');
- el.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const n=b.dataset.p;cur=cur===n?null:n;el.querySelectorAll('[data-p]').forEach(x=>x.classList.toggle('on',x.dataset.p===cur));
-  if(!cur){res.innerHTML='';return}
-  const l=P.map[cur];res.innerHTML=`<div class="sec-h"><h2>פרשת ${cur}</h2><small>${l.length} שיעורים</small></div><div class="vtg">${l.map(e=>`<a class="vt" href="https://www.youtube.com/watch?v=${e.id}" target="_blank" rel="noopener"><div class="vplay">${T[e.id]?`<img src="${T[e.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span>${esc(e.t)}</span></a>`).join('')}</div>`;res.scrollIntoView({behavior:'smooth',block:'nearest'})});
+ el.querySelector('#psel').addEventListener('change',e=>{const n=e.target.value;
+  if(!n){res.innerHTML='';return}
+  const l=P.map[n];res.innerHTML=`<div class="sec-h"><h2>פרשת ${esc(n)}</h2><small>${l.length} שיעורים</small></div><div class="vtg">${l.map(x=>`<a class="vt" href="https://www.youtube.com/watch?v=${x.id}" target="_blank" rel="noopener"><div class="vplay">${T[x.id]?`<img src="${T[x.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span>${esc(x.t)}</span></a>`).join('')}</div>`;res.scrollIntoView({behavior:'smooth',block:'nearest'})});
 }
 /* ---------- featured on home ---------- */
 async function featured(){const el=document.getElementById('dvar');if(!el)return;await load(['featured']);const f=D.featured;const day=Math.floor(Date.now()/864e5);const pick=[0,1,2].map(i=>f[(day+i*5)%f.length]);
