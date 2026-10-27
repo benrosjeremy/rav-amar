@@ -263,3 +263,10 @@ nav a[href="ask.html"]:hover{background:#a37f38}
 .vm-fb{position:relative;width:100%;height:100%;display:grid;place-items:center;text-align:center;color:#fff}
 .vm-fb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.4)}
 .vm-fb div{position:relative;padding:20px;max-width:30em}.vm-fb .btn{margin:8px 0 0}
+
+.pf{background:var(--paper);border:1px solid #eadfc2;border-radius:18px;padding:22px 24px;margin-bottom:34px}
+.pf h2{font-size:1.5rem}.pf>p{color:#4a5170;margin:4px 0 14px}
+.pfr{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:start;padding:9px 0;border-top:1px solid #f0e6c8}
+.pfr>b{color:var(--terra);padding-top:7px}.pfr>div{display:flex;flex-wrap:wrap;gap:8px}
+.pfr .chip{padding:5px 14px;font-size:.95rem}.pfr .chip small{opacity:.65;margin-inline-start:4px}
+@media(max-width:560px){.pfr{grid-template-columns:1fr;gap:4px}}
