@@ -46,9 +46,9 @@ async function flat(key,opts){
  let kind='הכול';
  function home(){
   const kinds=opts.kinds?['הכול',...new Set(d.map(x=>x.k))]:null;
-  root.innerHTML=(kinds?`<div class="bar" id="kbar">${kinds.map(k=>`<button class="chip ${k===kind?'on':''}" data-k="${k}">${k}</button>`).join('')}</div>`:'')+`<div class="alist" id="al"></div>`;
-  const draw=()=>{$('#al').innerHTML=d.map((it,i)=>[it,i]).filter(([it])=>!opts.kinds||kind==='הכול'||it.k===kind).map(([it,i])=>`<a class="arow" href="#${opts.p}${i+1}"><h3>${esc(it.t)}</h3>${opts.kinds?`<p>${it.k}</p>`:`<p>${esc(excerpt(it,220))}</p>`}</a>`).join('')};draw();
-  const kb=$('#kbar');kb&&kb.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;kind=k;kb.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()})
+  root.innerHTML=`<div class="search"><input id="fq" type="search" placeholder="חיפוש ב${opts.title}" aria-label="חיפוש"></div>`+(kinds?`<div class="bar" id="kbar">${kinds.map(k=>`<button class="chip ${k===kind?'on':''}" data-k="${k}">${k}</button>`).join('')}</div>`:'')+`<div class="alist" id="al"></div>`;
+  let q='';const idx=d.map(it=>nik(it.t+' '+it.p.map(p=>p.t).join(' ')));const draw=()=>{const hit=$('#al');$('#al').innerHTML=d.map((it,i)=>[it,i]).filter(([it,i])=>(!opts.kinds||kind==='הכול'||it.k===kind)&&(!q||idx[i].includes(q))).map(([it,i])=>`<a class="arow" href="#${opts.p}${i+1}"><h3>${esc(it.t)}</h3>${opts.kinds?`<p>${it.k}</p>`:`<p>${esc(excerpt(it,220))}</p>`}</a>`).join('')};draw();
+  let t;$('#fq').addEventListener('input',e=>{clearTimeout(t);t=setTimeout(()=>{q=nik(e.target.value.trim());draw();if(q&&!$('#al').children.length)$('#al').innerHTML='<p class="note">לא נמצאו תוצאות</p>'},200)});const kb=$('#kbar');kb&&kb.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;kind=k;kb.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()})
  }
  function article(i){const it=d[i-1];if(!it)return home();const prev=d[i-2],next=d[i];
   root.innerHTML=`<article class="read"><p class="crumb"><a href="#">${opts.title}</a></p><h1>${esc(it.t)}</h1>${tools()}${paras(it.p,opts.poem?'poem':'')}<div class="pn"><span>${prev?`<a href="#${opts.p}${i-1}">→ ${esc(prev.t.slice(0,60))}<small>הקודם</small></a>`:''}</span><span>${next?`<a href="#${opts.p}${i+1}">${esc(next.t.slice(0,60))} ←<small>הבא</small></a>`:''}</span></div></article>`;bindTools(root)}
@@ -69,12 +69,22 @@ async function archive(){
  bar.addEventListener('click',e=>{const k=e.target.dataset.k;if(k==null)return;cur=+k;shown=24;bar.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()});
  box.addEventListener('click',e=>{if(e.target.closest('.more')){shown+=24;draw()}});
 }
+/* ---------- videos by parasha ---------- */
+async function pfilter(){
+ const el=document.getElementById('pfil');if(!el)return;await load(['pidx','thumbs']);const P=D.pidx,T=D.thumbs||{};let cur=null;
+ el.innerHTML=`<div class="pf"><h2>שיעורים לפי פרשת השבוע</h2><p>בחרו פרשה וראו את כל השיעורים והדרשות עליה בערוץ.</p>`+P.order.map(([ch,ns])=>`<div class="pfr"><b>ספר ${ch}</b><div>${ns.map(n=>`<button class="chip" data-p="${n}">${n} <small>${P.map[n].length}</small></button>`).join('')}</div></div>`).join('')+`</div><div id="pres"></div>`;
+ const res=el.querySelector('#pres');
+ el.addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const n=b.dataset.p;cur=cur===n?null:n;el.querySelectorAll('[data-p]').forEach(x=>x.classList.toggle('on',x.dataset.p===cur));
+  if(!cur){res.innerHTML='';return}
+  const l=P.map[cur];res.innerHTML=`<div class="sec-h"><h2>פרשת ${cur}</h2><small>${l.length} שיעורים</small></div><div class="vtg">${l.map(e=>`<a class="vt" href="https://www.youtube.com/watch?v=${e.id}" target="_blank" rel="noopener"><div class="vplay">${T[e.id]?`<img src="${T[e.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span>${esc(e.t)}</span></a>`).join('')}</div>`;res.scrollIntoView({behavior:'smooth',block:'nearest'})});
+}
 /* ---------- featured on home ---------- */
 async function featured(){const el=document.getElementById('dvar');if(!el)return;await load(['featured']);const f=D.featured;const day=Math.floor(Date.now()/864e5);const pick=[0,1,2].map(i=>f[(day+i*5)%f.length]);
  el.innerHTML=pick.map(x=>`<a class="card" href="parasha.html#${x.h}" style="display:block"><small style="color:var(--terra)">${x.par}</small><h3>${esc(x.t)}</h3><p style="font-family:'Frank Ruhl Libre',serif;font-size:1.02rem;line-height:1.8;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${esc(x.x)}</p><p style="margin-top:8px"><b style="color:var(--blue)">לקריאה ←</b></p></a>`).join('')}
 document.addEventListener('DOMContentLoaded',()=>{
  const pg=document.body.dataset.page;
  if(pg==='parasha')parasha();
+ if(pg==='videos')pfilter();
  if(pg==='shut')flat('shut',{p:'s',title:'שו"ת'});
  if(pg==='shira')flat('shira',{p:'h',title:'שירה ותפילה',kinds:true,poem:true});
  archive();featured();
