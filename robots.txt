@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://benrosjeremy.github.io/rav-amar/sitemap.xml
