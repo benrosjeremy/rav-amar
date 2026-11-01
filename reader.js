@@ -63,30 +63,59 @@ async function flat(key,opts){
 
 /* ---------- video archive: playlists with thumbnails ---------- */
 async function archive(){
- const el=document.getElementById('varch');if(!el)return;await load(['playlists','thumbs']);const G=D.playlists,T=D.thumbs||{};let cur=0,shown=24;
- el.innerHTML=`<div class="bar" id="vcb"></div><div id="vlist"></div>`;
+ const el=document.getElementById('varch');if(!el)return;
+ await load(['playlists','thumbs']);
+ const G=D.playlists,T=D.thumbs||{};let cur=0,shown=24;
+ el.innerHTML='<div class="bar" id="vcb"></div><div id="vlist"></div>';
  const bar=$('#vcb'),box=$('#vlist');
- bar.className='tilebar';bar.innerHTML=G.map((g,i)=>`<button class="chip ${i===cur?'on':''}" data-k="${i}">${g.t} (${g.l.reduce((n,l)=>n+l.v.length,0)})</button>`).join('');
- const card=e=>`<a class="vt" href="https://www.youtube.com/watch?v=${e.id}" target="_blank" rel="noopener"><div class="vplay">${T[e.id]?`<img src="${T[e.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span>${esc(e.t)}</span></a>`;
- const draw=()=>{const g=G[cur];let left=shown,h='';for(const l of g.l){if(left<=0)break;const part=l.v.slice(0,left);left-=part.length;h+=(g.l.length>1?`<h3 class="vh">${esc(l.t)}</h3>`:'')+`<div class="vtg">${part.map(card).join('')}</div>`}
-  const total=g.l.reduce((n,l)=>n+l.v.length,0);if(shown<total)h+=`<p style="text-align:center;margin-top:22px"><button class="btn more" style="background:var(--blue);color:#fff;border-color:var(--blue)">הצג עוד</button></p>`;
-  h+=`<p style="text-align:center;margin-top:14px"><a href="https://www.youtube.com/@masilatysarim/playlists" target="_blank" rel="noopener"><b>לכל הפלייליסטים ביוטיוב ←</b></a></p>`;box.innerHTML=h};draw();
- bar.addEventListener('click',e=>{const k=e.target.dataset.k;if(k==null)return;cur=+k;shown=24;bar.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()});
+ bar.className='tilebar';
+ const card=e=>`<a class="vt" href="https://www.youtube.com/watch?v=${e.id}" target="_blank" rel="noopener"><div class="vplay">${T[e.id]?`<img src="${T[e.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span dir="auto">${esc(e.t)}</span></a>`;
+ const draw=()=>{const g=G[cur];let left=shown,h='';
+  for(const l of g.l){
+   if(left<=0)break;const part=l.v.slice(0,left);left-=part.length;
+   h+=(g.l.length>1?`<h3 class="vh">${esc(ui(l.t))}</h3>`:'')+`<div class="vtg">${part.map(card).join('')}</div>`;
+  }
+  const total=g.l.reduce((n,l)=>n+l.v.length,0);
+  if(shown<total)h+=`<p style="text-align:center;margin-top:22px"><button class="btn more" style="background:var(--blue);color:#fff;border-color:var(--blue)">${ui('הצג עוד')}</button></p>`;
+  h+=`<p style="text-align:center;margin-top:14px"><a href="https://www.youtube.com/@masilatysarim/playlists" target="_blank" rel="noopener"><b>${ui('לכל הפלייליסטים ביוטיוב ←')}</b></a></p>`;
+  box.innerHTML=h;
+ };
+ const render=()=>{bar.innerHTML=G.map((g,i)=>`<button class="chip ${i===cur?'on':''}" data-k="${i}">${esc(ui(g.t))} (${g.l.reduce((n,l)=>n+l.v.length,0)})</button>`).join('');draw()};
+ render();
+ bar.addEventListener('click',e=>{const k=e.target.closest('[data-k]')?.dataset.k;if(k==null)return;cur=+k;shown=24;render()});
  box.addEventListener('click',e=>{if(e.target.closest('.more')){shown+=24;draw()}});
+ document.addEventListener('site-language-changed',render);
 }
 /* ---------- videos by parasha ---------- */
 async function pfilter(){
- const el=document.getElementById('pfil');if(!el)return;await load(['pidx','thumbs']);const P=D.pidx,T=D.thumbs||{};
- const groups=P.order.map(([ch,ns])=>`<optgroup label="ספר ${ch}">${ns.map(n=>`<option value="${esc(n)}">${esc(n)} (${P.map[n].length})</option>`).join('')}</optgroup>`).join('');
- el.innerHTML=`<div class="pf"><h2>שיעורים לפי פרשת השבוע</h2><p>בחרו פרשה וראו את כל השיעורים והדרשות עליה בערוץ.</p><select id="psel"><option value="">בחרו פרשה…</option>${groups}</select></div><div id="pres"></div>`;
- const res=el.querySelector('#pres');
- el.querySelector('#psel').addEventListener('change',e=>{const n=e.target.value;
-  if(!n){res.innerHTML='';return}
-  const l=P.map[n];res.innerHTML=`<div class="sec-h"><h2>פרשת ${esc(n)}</h2><small>${l.length} שיעורים</small></div><div class="vtg">${l.map(x=>`<a class="vt" href="https://www.youtube.com/watch?v=${x.id}" target="_blank" rel="noopener"><div class="vplay">${T[x.id]?`<img src="${T[x.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span>${esc(x.t)}</span></a>`).join('')}</div>`;res.scrollIntoView({behavior:'smooth',block:'nearest'})});
+ const el=document.getElementById('pfil');if(!el)return;
+ await load(['pidx','thumbs']);
+ const P=D.pidx,T=D.thumbs||{};
+ let selected='';
+ const results=(scroll)=>{
+  const box=el.querySelector('#pres');if(!selected){box.innerHTML='';return}
+  const n=selected,l=P.map[n];
+  box.innerHTML=`<div class="sec-h"><h2>${ui('פרשת')} ${portion(n)}</h2><small>${l.length} ${ui('שיעורים')}</small></div><div class="vtg">${l.map(x=>`<a class="vt" href="https://www.youtube.com/watch?v=${x.id}" target="_blank" rel="noopener"><div class="vplay">${T[x.id]?`<img src="${T[x.id]}" alt="" loading="lazy" width="256" height="144">`:''}<i class="pb"></i></div><span dir="auto">${esc(x.t)}</span></a>`).join('')}</div>`;
+  if(scroll)box.scrollIntoView({behavior:'smooth',block:'nearest'});
+ };
+ const render=()=>{
+  const groups=P.order.map(([ch,ns])=>`<optgroup label="${bookLabel(ch)}">${ns.map(n=>`<option value="${esc(n)}">${portion(n)} (${P.map[n].length})</option>`).join('')}</optgroup>`).join('');
+  el.innerHTML=`<div class="pf"><h2>${ui('שיעורים לפי פרשת השבוע')}</h2><p>${ui('בחרו פרשה וראו את כל השיעורים והדרשות עליה בערוץ.')}</p><select id="psel" aria-label="${ui('בחרו פרשה…')}"><option value="">${ui('בחרו פרשה…')}</option>${groups}</select></div><div id="pres"></div>`;
+  el.querySelector('#psel').value=selected;results(false);
+ };
+ el.addEventListener('change',e=>{if(e.target.matches('#psel')){selected=e.target.value;results(true)}});
+ document.addEventListener('site-language-changed',render);
+ render();
 }
 /* ---------- featured on home ---------- */
-async function featured(){const el=document.getElementById('dvar');if(!el)return;await load(['featured']);const f=D.featured;const day=Math.floor(Date.now()/864e5);const pick=[0,1,2].map(i=>f[(day+i*5)%f.length]);
- el.innerHTML=pick.map(x=>`<a class="card" href="parasha.html#${x.h}" style="display:block"><small style="color:var(--terra)">${x.par}</small><h3>${esc(x.t)}</h3><p style="font-family:'Frank Ruhl Libre',serif;font-size:1.02rem;line-height:1.8;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${esc(x.x)}</p><p style="margin-top:8px"><b style="color:var(--blue)">לקריאה ←</b></p></a>`).join('')}
+async function featured(){
+ const el=document.getElementById('dvar');if(!el)return;
+ await load(['featured']);
+ const f=D.featured,day=Math.floor(Date.now()/864e5);
+ const pick=[0,1,2].map(i=>f[(day+i*5)%f.length]);
+ const render=()=>{el.innerHTML=pick.map(x=>`<a class="card" href="parasha.html#${x.h}" style="display:block"><small style="color:var(--terra)">${portion(x.par)}</small><h3 lang="he" dir="rtl">${esc(x.t)}</h3><p lang="he" dir="rtl" style="font-family:'Frank Ruhl Libre',serif;font-size:1.02rem;line-height:1.8;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${esc(x.x)}</p><p style="margin-top:8px"><b style="color:var(--blue)">${ui('לקריאה ←')}</b></p></a>`).join('')};
+ render();document.addEventListener('site-language-changed',render);
+}
 document.addEventListener('DOMContentLoaded',()=>{
  const pg=document.body.dataset.page;
  if(pg==='parasha')parasha();
