@@ -1,0 +1,22 @@
+name: Site i18n smoke checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check app.js
+          node --check reader.js
+          node --check data/i18n.js
+      - name: Localization contract checks
+        run: node --test tests/i18n-contract.test.cjs
