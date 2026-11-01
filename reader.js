@@ -1,11 +1,19 @@
 (function(){
 const $=s=>document.querySelector(s);
+// Site interface labels are translated; original Torah texts and titles are not.
+const INTERFACE_LABELS={
+ en:{'הכול':'All','שיר':'Poem','תפילה':'Prayer','שבת':'Shabbat','שמחות':'Celebrations','מעגל השנה':'Jewish calendar','שירה ותפילה':'Poetry and prayer','חיפוש ב':'Search ','לא נמצאו תוצאות':'No results found','טוען...':'Loading...','הקודם':'Previous','הבא':'Next','הדפסה':'Print','אימייל':'Email','וואטסאפ':'WhatsApp','חיפוש':'Search'},
+ fr:{'הכול':'Tout','שיר':'Poème','תפילה':'Prière','שבת':'Chabbat','שמחות':'Célébrations','מעגל השנה':'Cycle de l’année','שירה ותפילה':'Poésie et prière','חיפוש ב':'Rechercher dans ','לא נמצאו תוצאות':'Aucun résultat','טוען...':'Chargement...','הקודם':'Précédent','הבא':'Suivant','הדפסה':'Imprimer','אימייל':'E-mail','וואטסאפ':'WhatsApp','חיפוש':'Rechercher'}
+};
+const language=()=>{try{return localStorage.getItem('site_lang')||'he'}catch(e){return 'he'}};
+const ui=(s)=>(INTERFACE_LABELS[language()]||{})[s]||s;
+
 const nik=s=>s.replace(/[֑-ׇ]/g,'').replace(/["״'׳]/g,'').replace(/\s+/g,' ');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function load(names){return Promise.all(names.map(n=>new Promise((res,rej)=>{window.D=window.D||{};if(D[n])return res();const s=document.createElement('script');s.src='data/'+n+'.js';s.onload=res;s.onerror=()=>rej(n);document.head.appendChild(s)})))}
 let fs=1.18;try{fs=parseFloat(localStorage.getItem('fs'))||1.18}catch(e){}
 function paras(ps,cls){return `<div class="body ${cls||''}" style="--fs:${fs}rem">`+ps.map((p,i)=>{let c=p.b?'verse':'';if(i===0&&/^בס["״]?ד|^בעהית|^בעזהית|^ב[״"]?ה|תשס|תשע/.test(p.t)&&p.t.length<120)c='date';return `<p class="${c}">${esc(p.t)}</p>`}).join('')+'</div>'}
-function tools(){return `<div class="tools"><button data-z="-1" aria-label="הקטן טקסט">א−</button><button data-z="1" aria-label="הגדל טקסט">א+</button><span class="sp"></span><button data-a="wa" aria-label="שיתוף בוואטסאפ">וואטסאפ</button><button data-a="mail" aria-label="שליחה באימייל">אימייל</button><button data-a="print" aria-label="הדפסה">הדפסה</button></div>`}
+function tools(){return `<div class="tools"><button data-z="-1" aria-label="הקטן טקסט">א−</button><button data-z="1" aria-label="הגדל טקסט">א+</button><span class="sp"></span><button data-a="wa" aria-label="שיתוף בוואטסאפ" >${ui('וואטסאפ')}</button><button data-a="mail" aria-label="שליחה באימייל" >${ui('אימייל')}</button><button data-a="print" aria-label="הדפסה" >${ui('הדפסה')}</button></div>`}
 function bindTools(root){root.querySelectorAll('.tools [data-a]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.a,u=location.href,t=(root.querySelector('h1')||{}).textContent||document.title;if(a==='print')window.print();else if(a==='wa')window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener');else location.href='mailto:?subject='+encodeURIComponent(t)+'&body='+encodeURIComponent(u)}));root.querySelectorAll('.tools button').forEach(b=>b.addEventListener('click',()=>{fs=Math.min(1.7,Math.max(.95,fs+(+b.dataset.z)*.1));try{localStorage.setItem('fs',fs)}catch(e){}const bd=root.querySelector('.body');bd&&bd.style.setProperty('--fs',fs+'rem')}))}
 function top(){window.scrollTo({top:0})}
 function excerpt(it,n){const b=it.p.find(p=>!p.b&&p.t.length>60)||it.p[0];return b?b.t.slice(0,n||200):''}
@@ -42,16 +50,16 @@ async function parasha(){
 
 /* ---------- shut / shira ---------- */
 async function flat(key,opts){
- const root=$('#app');root.innerHTML='<div class="loading">טוען...</div>';await load([key]);const d=D[key];
+ const root=$('#app');root.innerHTML='<div class="loading">'+ui('טוען...')+'</div>';await load([key]);const d=D[key];
  let kind='הכול';
  function home(){
   const kinds=opts.kinds?['הכול',...new Set(d.map(x=>x.k))]:null;
-  root.innerHTML=`<div class="search"><input id="fq" type="search" placeholder="חיפוש ב${opts.title}" aria-label="חיפוש"></div>`+(kinds?`<div class="bar" id="kbar">${kinds.map(k=>`<button class="chip ${k===kind?'on':''}" data-k="${k}">${k}</button>`).join('')}</div>`:'')+`<div class="alist" id="al"></div>`;
-  let q='';const idx=d.map(it=>nik(it.t+' '+it.p.map(p=>p.t).join(' ')));const draw=()=>{const hit=$('#al');$('#al').innerHTML=d.map((it,i)=>[it,i]).filter(([it,i])=>(!opts.kinds||kind==='הכול'||it.k===kind)&&(!q||idx[i].includes(q))).map(([it,i])=>`<a class="arow" href="#${opts.p}${i+1}"><h3>${esc(it.t)}</h3>${opts.kinds?`<p>${it.k}</p>`:`<p>${esc(excerpt(it,220))}</p>`}</a>`).join('')};draw();
-  let t;$('#fq').addEventListener('input',e=>{clearTimeout(t);t=setTimeout(()=>{q=nik(e.target.value.trim());draw();if(q&&!$('#al').children.length)$('#al').innerHTML='<p class="note">לא נמצאו תוצאות</p>'},200)});const kb=$('#kbar');kb&&kb.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;kind=k;kb.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()})
+  root.innerHTML=`<div class="search"><input id="fq" type="search" placeholder="${ui('חיפוש ב')}${ui(opts.title)}" aria-label="חיפוש"></div>`+(kinds?`<div class="bar" id="kbar">${kinds.map(k=>`<button class="chip ${k===kind?'on':''}" data-k="${k}">${ui(k)}</button>`).join('')}</div>`:'')+`<div class="alist" id="al"></div>`;
+  let q='';const idx=d.map(it=>nik(it.t+' '+it.p.map(p=>p.t).join(' ')));const draw=()=>{const hit=$('#al');$('#al').innerHTML=d.map((it,i)=>[it,i]).filter(([it,i])=>(!opts.kinds||kind==='הכול'||it.k===kind)&&(!q||idx[i].includes(q))).map(([it,i])=>`<a class="arow" href="#${opts.p}${i+1}"><h3 lang="he" dir="rtl">${esc(it.t)}</h3>${opts.kinds?`<p>${ui(it.k)}</p>`:`<p lang="he" dir="rtl">${esc(excerpt(it,220))}</p>`}</a>`).join('')};draw();
+  let t;$('#fq').addEventListener('input',e=>{clearTimeout(t);t=setTimeout(()=>{q=nik(e.target.value.trim());draw();if(q&&!$('#al').children.length)$('#al').innerHTML='<p class="note">'+ui('לא נמצאו תוצאות')+'</p>'},200)});const kb=$('#kbar');kb&&kb.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;kind=k;kb.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));draw()})
  }
  function article(i){const it=d[i-1];if(!it)return home();const prev=d[i-2],next=d[i];
-  root.innerHTML=`<article class="read"><p class="crumb"><a href="#">${opts.title}</a></p><h1>${esc(it.t)}</h1>${tools()}${paras(it.p,opts.poem?'poem':'')}<div class="pn"><span>${prev?`<a href="#${opts.p}${i-1}">→ ${esc(prev.t.slice(0,60))}<small>הקודם</small></a>`:''}</span><span>${next?`<a href="#${opts.p}${i+1}">${esc(next.t.slice(0,60))} ←<small>הבא</small></a>`:''}</span></div></article>`;bindTools(root)}
+  root.innerHTML=`<article class="read"><p class="crumb"><a href="#">${ui(opts.title)}</a></p><h1 lang="he" dir="rtl">${esc(it.t)}</h1>${tools()}<div lang="he" dir="rtl">${paras(it.p,opts.poem?'poem':'')}</div><div class="pn"><span>${prev?`<a href="#${opts.p}${i-1}">→ ${esc(prev.t.slice(0,60))}<small>${ui('הקודם')}</small></a>`:''}</span><span>${next?`<a href="#${opts.p}${i+1}">${esc(next.t.slice(0,60))} ←<small>${ui('הבא')}</small></a>`:''}</span></div></article>`;bindTools(root)}
  function route(){const m=location.hash.slice(1).match(new RegExp('^'+opts.p+'(\\d+)$'));m?article(+m[1]):home();top()}
  window.addEventListener('hashchange',route);route();
 }
