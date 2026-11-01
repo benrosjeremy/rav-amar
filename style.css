@@ -280,3 +280,17 @@ nav a[href="ask.html"]:hover{background:#a37f38}
 .pf{background:var(--paper);border:1px solid #eadfc2;border-radius:18px;padding:22px 24px;margin-bottom:34px}
 .pf h2{font-size:1.5rem}.pf>p{color:#4a5170;margin:4px 0 14px}
 .pf select{max-width:420px;cursor:pointer}
+
+/* Mobile language navigation: keep dropdowns collapsed until focused. */
+@media(max-width:860px){
+ header nav .dd>ul{display:none}
+ header nav .dd:focus-within>ul{display:flex}
+ header nav .dd:hover:not(:focus-within)>ul{display:none}
+ header nav .dd>a,header nav .dd>button.dd-trigger{display:block;width:100%;text-align:start}
+ header nav .langsw>button.dd-trigger{width:auto}
+ header nav.open{max-height:calc(100dvh - 70px);overflow-y:auto}
+}
+@media(max-width:520px){
+ header nav.open{max-height:calc(100dvh - 64px)}
+}
+.read .body[lang="he"],.read [lang="he"],.alist [lang="he"]{direction:rtl;unicode-bidi:isolate}
