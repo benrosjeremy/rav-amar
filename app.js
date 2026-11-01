@@ -55,15 +55,18 @@ document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementByI
  const MONS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
  const n=new Date(),dt=new Date(n);dt.setHours(20,30,0,0);let add=(4-n.getDay()+7)%7;if(add===0&&n>dt)add=7;dt.setDate(n.getDate()+add);
  const days=Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);
- const when=days===0?'היום, בשעה 20:30':days===1?'מחר, בשעה 20:30':`בעוד ${days} ימים, ביום חמישי ${dt.getDate()} ב${MONS[dt.getMonth()]}`;
+ const schedule=()=>{if(days===0)return ui('היום, בשעה 20:30');if(days===1)return ui('מחר, בשעה 20:30');
+  if(siteLocale()==='he')return `בעוד ${days} ימים, ביום חמישי ${dt.getDate()} ב${MONS[dt.getMonth()]}`;
+  const date=new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':'en-GB',{weekday:'long',day:'numeric',month:'long'}).format(dt);
+  return siteLocale()==='fr'?`Dans ${days} jours, ${date} à 20 h 30`:`In ${days} days, ${date} at 20:30`};
  const full=VIDEOS.filter(v=>v.k==='full'),main=full[0]||VIDEOS[0],hl=VIDEOS.find(v=>v.k==='hl')||VIDEOS[1],prev=full[1]||VIDEOS[2];
  const render=()=>{const T=(window.D&&D.thumbs15)||{};const img=id=>T[id]?`<img src="${T[id]}" alt="" width="256" height="144">`:'';
  const yt=id=>`https://www.youtube.com/watch?v=${id}`;
- b.innerHTML=`<a class="bmain" href="${yt(main.id)}" target="_blank" rel="noopener"><div class="bth">${img(main.id)}<i class="pb"></i></div><div class="bt"><span class="tag"><b>${ui('שיעור שבועי')}</b> | מסילת ישרים</span><h2 dir="auto">${main.t}</h2><p dir="auto">${main.s}</p><span class="bgo">${ui('לצפייה בשיעור ←')}</span></div></a>
- <div class="bside"><div class="bit next"><span class="tag"><b>${ui('השיעור הבא')}</b> | בית מדרש "נר התורה"</span><h3>${when}</h3><p>${ui('בר אילן 9, ירושלים. השידור והשיעורים מתפרסמים בערוץ היוטיוב.')}</p></div>
+ b.innerHTML=`<a class="bmain" href="${yt(main.id)}" target="_blank" rel="noopener"><div class="bth">${img(main.id)}<i class="pb"></i></div><div class="bt"><span class="tag"><b>${ui('שיעור שבועי')}</b> | ${ui('מסילת ישרים')}</span><h2 dir="auto">${main.t}</h2><p dir="auto">${main.s}</p><span class="bgo">${ui('לצפייה בשיעור ←')}</span></div></a>
+ <div class="bside"><div class="bit next"><span class="tag"><b>${ui('השיעור הבא')}</b> | ${ui('בית מדרש "נר התורה"')}</span><h3>${schedule()}</h3><p>${ui('בר אילן 9, ירושלים. השידור והשיעורים מתפרסמים בערוץ היוטיוב.')}</p></div>
  <a class="bit" href="${yt(hl.id)}" target="_blank" rel="noopener"><span class="tag"><b>${ui('רגעי שיא')}</b></span><h3 dir="auto">${hl.t}</h3><p dir="auto">${hl.s}</p></a>
  <a class="bit" href="${yt(prev.id)}" target="_blank" rel="noopener"><span class="tag"><b>${ui('שיעור קודם')}</b></span><h3 dir="auto">${prev.t}</h3><p dir="auto">${prev.s}</p></a>
- <a class="bit" href="parasha.html"><span class="tag"><b>${ui('דברי תורה')}</b> | פרשת השבוע</span><h3>${ui('מאות דברי תורה על בראשית ושמות')}</h3><p>${ui('עם חיפוש לפי נושא וקריאה בגופן מתכוונן.')}</p></a></div>`};
+ <a class="bit" href="parasha.html"><span class="tag"><b>${ui('דברי תורה')}</b> | ${ui('פרשת השבוע')}</span><h3>${ui('מאות דברי תורה על בראשית ושמות')}</h3><p>${ui('עם חיפוש לפי נושא וקריאה בגופן מתכוונן.')}</p></a></div>`};
  render();document.addEventListener('site-language-changed',render);const sc=document.createElement('script');sc.src='data/thumbs15.js';sc.onload=render;document.head.appendChild(sc)});
 
 /* ---- global: date strip, ask tab, newsletter ---- */
@@ -74,7 +77,12 @@ function hdate(d){try{const p=Object.fromEntries(new Intl.DateTimeFormat('he-u-c
 document.addEventListener('DOMContentLoaded',()=>{
  const n=new Date(),days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],MON=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
  const hd=hdate(n);const st=document.createElement('div');st.className='strip';
- st.innerHTML=`<div class="wrap"><span>יום ${days[n.getDay()]}, ${hd?hd+' · ':''}${n.getDate()} ב${MON[n.getMonth()]} ${n.getFullYear()}</span><span class="sl">שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש "נר התורה", בר אילן 9, ירושלים</span></div>`;
+ const drawStrip=()=>{
+  const date=siteLocale()==='he'? `יום ${days[n.getDay()]}, ${hd?hd+' · ':''}${n.getDate()} ב${MON[n.getMonth()]} ${n.getFullYear()}`:
+   new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(n);
+  st.innerHTML='<div class="wrap"><span>'+date+'</span><span class="sl">'+ui('שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש "נר התורה", בר אילן 9, ירושלים')+'</span></div>';
+ };
+ drawStrip();document.addEventListener('site-language-changed',drawStrip);
  document.body.insertBefore(st,document.body.firstChild);
  if(!document.querySelector('.newsl')){const ft=document.querySelector('footer');if(ft){const s=document.createElement('section');s.style.paddingTop='10px';s.innerHTML='<div class="wrap"><form class="newsl" data-i18n-region="newsletter"><div><h2>דבר תורה למייל</h2><p>הצטרפו לרשימת התפוצה וקבלו מדי שבוע דבר תורה מהרב, יחד עם מועד השיעור הקרוב.</p></div><div class="nf"><input type="text" placeholder="שם מלא" aria-label="שם מלא"><input type="email" placeholder="כתובת אימייל" aria-label="אימייל"><button class="btn" type="submit">הרשמה</button></div></form></div>';ft.parentNode.insertBefore(s,ft);}}
  window.__wireAsktab=function(w){
@@ -122,7 +130,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
   var cur=LANGS.filter(function(l){return l[0]===lang})[0]||LANGS[0];
   var li=document.createElement('li');
   li.className='dd langsw';
-  li.innerHTML='<button type="button" class="dd-trigger" aria-label="שפה">'+cur[1]+'</button><ul>'+LANGS.map(function(l){
+  li.innerHTML='<button type="button" class="dd-trigger" aria-label="'+ui('שפת האתר')+'">'+cur[1]+'</button><ul>'+LANGS.map(function(l){
    return '<li><button type="button" data-lang="'+l[0]+'" class="'+(l[0]===lang?'on':'')+'">'+l[1]+' '+l[2]+'</button></li>';
   }).join('')+'</ul>';
   ul.appendChild(li);
