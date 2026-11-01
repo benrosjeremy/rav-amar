@@ -109,17 +109,20 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
   var here=location.pathname.split('/').pop()||'index.html';
   document.querySelectorAll('nav a').forEach(function(a){a.classList.toggle('on', a.getAttribute('href')===here)});
  }
+ var LANGS=[['he','🇮🇱','עברית'],['en','🇬🇧','English'],['fr','🇫🇷','Français']];
  function buildSwitcher(lang){
   document.querySelectorAll('.langsw').forEach(function(e){e.remove()});
   var ul=document.querySelector('header nav ul');
   if(!ul) return;
+  var cur=LANGS.filter(function(l){return l[0]===lang})[0]||LANGS[0];
   var li=document.createElement('li');
-  li.className='langsw';
-  li.innerHTML='<button type="button" data-lang="he">עברית</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button>';
+  li.className='dd langsw';
+  li.innerHTML='<button type="button" class="dd-trigger" aria-label="שפה">'+cur[1]+'</button><ul>'+LANGS.map(function(l){
+   return '<li><button type="button" data-lang="'+l[0]+'" class="'+(l[0]===lang?'on':'')+'">'+l[1]+' '+l[2]+'</button></li>';
+  }).join('')+'</ul>';
   ul.appendChild(li);
-  li.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-lang')===lang)});
   li.addEventListener('click',function(e){
-   var b=e.target.closest('button'); if(!b) return;
+   var b=e.target.closest('button[data-lang]'); if(!b) return;
    applyLang(b.getAttribute('data-lang'));
   });
  }
