@@ -1,51 +1,48 @@
 (function(){
 const $=s=>document.querySelector(s);
-// Site interface labels are translated; original Torah texts and titles are not.
-const INTERFACE_LABELS={
- en:{'הכול':'All','שיר':'Poem','תפילה':'Prayer','שבת':'Shabbat','שמחות':'Celebrations','מעגל השנה':'Jewish calendar','שירה ותפילה':'Poetry and prayer','חיפוש ב':'Search ','לא נמצאו תוצאות':'No results found','טוען...':'Loading...','הקודם':'Previous','הבא':'Next','הדפסה':'Print','אימייל':'Email','וואטסאפ':'WhatsApp','חיפוש':'Search'},
- fr:{'הכול':'Tout','שיר':'Poème','תפילה':'Prière','שבת':'Chabbat','שמחות':'Célébrations','מעגל השנה':'Cycle de l’année','שירה ותפילה':'Poésie et prière','חיפוש ב':'Rechercher dans ','לא נמצאו תוצאות':'Aucun résultat','טוען...':'Chargement...','הקודם':'Précédent','הבא':'Suivant','הדפסה':'Imprimer','אימייל':'E-mail','וואטסאפ':'WhatsApp','חיפוש':'Rechercher'}
-};
-const language=()=>{try{return localStorage.getItem('site_lang')||'he'}catch(e){return 'he'}};
-const ui=(s)=>(INTERFACE_LABELS[language()]||{})[s]||s;
-
+// Only site UI is translated; the rabbi's Hebrew source text stays intact.
+const ui=s=>window.siteUi?window.siteUi(s):s;
+const portion=s=>window.sitePortion?window.sitePortion(s):s;
+const bookName=s=>window.siteBook?window.siteBook(s):s;
+const bookLabel=s=>ui('ספר')+' '+bookName(s);
 const nik=s=>s.replace(/[֑-ׇ]/g,'').replace(/["״'׳]/g,'').replace(/\s+/g,' ');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function load(names){return Promise.all(names.map(n=>new Promise((res,rej)=>{window.D=window.D||{};if(D[n])return res();const s=document.createElement('script');s.src='data/'+n+'.js';s.onload=res;s.onerror=()=>rej(n);document.head.appendChild(s)})))}
 let fs=1.18;try{fs=parseFloat(localStorage.getItem('fs'))||1.18}catch(e){}
 function paras(ps,cls){return `<div class="body ${cls||''}" style="--fs:${fs}rem">`+ps.map((p,i)=>{let c=p.b?'verse':'';if(i===0&&/^בס["״]?ד|^בעהית|^בעזהית|^ב[״"]?ה|תשס|תשע/.test(p.t)&&p.t.length<120)c='date';return `<p class="${c}">${esc(p.t)}</p>`}).join('')+'</div>'}
-function tools(){return `<div class="tools"><button data-z="-1" aria-label="הקטן טקסט">א−</button><button data-z="1" aria-label="הגדל טקסט">א+</button><span class="sp"></span><button data-a="wa" aria-label="שיתוף בוואטסאפ" >${ui('וואטסאפ')}</button><button data-a="mail" aria-label="שליחה באימייל" >${ui('אימייל')}</button><button data-a="print" aria-label="הדפסה" >${ui('הדפסה')}</button></div>`}
+function tools(){return `<div class="tools"><button data-z="-1" aria-label="${ui('הקטן טקסט')}">א−</button><button data-z="1" aria-label="${ui('הגדל טקסט')}">א+</button><span class="sp"></span><button data-a="wa" aria-label="${ui('שיתוף בוואטסאפ')}" >${ui('וואטסאפ')}</button><button data-a="mail" aria-label="${ui('שליחה באימייל')}" >${ui('אימייל')}</button><button data-a="print" aria-label="${ui('הדפסה')}" >${ui('הדפסה')}</button></div>`}
 function bindTools(root){root.querySelectorAll('.tools [data-a]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.a,u=location.href,t=(root.querySelector('h1')||{}).textContent||document.title;if(a==='print')window.print();else if(a==='wa')window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener');else location.href='mailto:?subject='+encodeURIComponent(t)+'&body='+encodeURIComponent(u)}));root.querySelectorAll('.tools button').forEach(b=>b.addEventListener('click',()=>{fs=Math.min(1.7,Math.max(.95,fs+(+b.dataset.z)*.1));try{localStorage.setItem('fs',fs)}catch(e){}const bd=root.querySelector('.body');bd&&bd.style.setProperty('--fs',fs+'rem')}))}
 function top(){window.scrollTo({top:0})}
 function excerpt(it,n){const b=it.p.find(p=>!p.b&&p.t.length>60)||it.p[0];return b?b.t.slice(0,n||200):''}
 
 /* ---------- parasha ---------- */
 async function parasha(){
- const root=$('#app');root.innerHTML='<div class="loading">טוען את דברי התורה...</div>';
+ const root=$('#app');root.innerHTML='<div class="loading">'+ui('טוען את דברי התורה...')+'</div>';
  await load(['bereshit','shemot']);
- const books=[{k:'b',name:'ספר בראשית',d:D.bereshit},{k:'s',name:'ספר שמות',d:D.shemot}];
+ const books=[{k:'b',name:'בראשית',d:D.bereshit},{k:'s',name:'שמות',d:D.shemot}];
  let idx=null;
  const buildIdx=()=>{if(idx)return;idx=[];books.forEach(bk=>bk.d.forEach((par,pi)=>par.items.forEach((it,ii)=>idx.push({h:`${bk.k}${pi+1}-${ii+1}`,t:it.t,par:par.name,nt:nik(it.t),tx:nik(it.p.map(p=>p.t).join(' '))}))))};
  function home(){
   const total=books.reduce((s,b)=>s+b.d.reduce((x,p)=>x+p.items.length,0),0);
-  root.innerHTML=`<div class="search"><input id="q" type="search" placeholder="חיפוש בדברי התורה (למשל: שבת, תפילה, אמונה)" aria-label="חיפוש"><button class="btn" id="go">חפש</button></div><div id="hits" class="hits"></div>`+
-  books.map(bk=>`<div class="sec-h"><h2>${bk.name}</h2><small>${bk.d.reduce((x,p)=>x+p.items.length,0)} דברי תורה</small></div><div class="tiles">${bk.d.map((p,i)=>`<a class="tile" href="#${bk.k}${i+1}"><b>${p.name}</b><span>${p.items.length} מאמרים</span></a>`).join('')}</div>`).join('')+`<p class="note" style="margin-top:34px">${total} דברי תורה מפי הרב, מסודרים לפי פרשות השבוע.</p>`;
+  root.innerHTML=`<div class="search"><input id="q" type="search" placeholder="${ui('חיפוש בדברי התורה (למשל: שבת, תפילה, אמונה)')}" aria-label="חיפוש"><button class="btn" id="go">${ui('חפש')}</button></div><div id="hits" class="hits"></div>`+
+  books.map(bk=>`<div class="sec-h"><h2>${bookLabel(bk.name)}</h2><small>${bk.d.reduce((x,p)=>x+p.items.length,0)} ${ui('דברי תורה')}</small></div><div class="tiles">${bk.d.map((p,i)=>`<a class="tile" href="#${bk.k}${i+1}"><b>${portion(p.name)}</b><span>${p.items.length} ${ui('מאמרים')}</span></a>`).join('')}</div>`).join('')+`<p class="note" style="margin-top:34px">${total} ${ui('דברי תורה מפי הרב, מסודרים לפי פרשות השבוע.')}</p>`;
   const q=$('#q'),hits=$('#hits');let t;
   const run=()=>{const v=nik(q.value.trim());if(v.length<2){hits.innerHTML='';return}buildIdx();const res=[];for(const e of idx){if(e.nt.includes(v))res.push([0,e]);else if(e.tx.includes(v))res.push([1,e])}res.sort((a,b)=>a[0]-b[0]);
-   hits.innerHTML=`<p class="note">${res.length?res.length+' תוצאות':'לא נמצאו תוצאות'}</p>`+res.slice(0,40).map(([r,e])=>{let sn='';if(r){const i=e.tx.indexOf(v);sn='...'+esc(e.tx.slice(Math.max(0,i-60),i+120))+'...'}return `<a class="hit" href="#${e.h}"><b>${esc(e.t)}</b><small>${e.par}</small>${sn?`<p>${sn}</p>`:''}</a>`}).join('')};
+   hits.innerHTML=`<p class="note">${res.length?res.length+' '+ui('תוצאות'):ui('לא נמצאו תוצאות')}</p>`+res.slice(0,40).map(([r,e])=>{let sn='';if(r){const i=e.tx.indexOf(v);sn='...'+esc(e.tx.slice(Math.max(0,i-60),i+120))+'...'}return `<a class="hit" href="#${e.h}"><b lang="he" dir="rtl">${esc(e.t)}</b><small>${portion(e.par)}</small>${sn?`<p>${sn}</p>`:''}</a>`}).join('')};
   q.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(run,250)});$('#go').addEventListener('click',run);
  }
  function list(bk,pi){
   const par=bk.d[pi-1];if(!par)return home();
-  root.innerHTML=`<p class="crumb"><a href="#">פרשת השבוע</a> › ${bk.name} › ${par.name}</p><div class="sec-h" style="margin-top:0"><h2>${par.name}</h2><small>${par.items.length} מאמרים</small></div><div class="alist">${par.items.map((it,i)=>`<a class="arow" href="#${bk.k}${pi}-${i+1}"><h3>${esc(it.t)}</h3><p>${esc(excerpt(it))}</p></a>`).join('')}</div>`;
+  root.innerHTML=`<p class="crumb"><a href="#">פרשת השבוע</a> › ${bookLabel(bk.name)} › ${portion(par.name)}</p><div class="sec-h" style="margin-top:0"><h2>${portion(par.name)}</h2><small>${par.items.length} ${ui('מאמרים')}</small></div><div class="alist">${par.items.map((it,i)=>`<a class="arow" href="#${bk.k}${pi}-${i+1}"><h3 lang="he" dir="rtl">${esc(it.t)}</h3><p lang="he" dir="rtl">${esc(excerpt(it))}</p></a>`).join('')}</div>`;
  }
  function article(bk,pi,ii){
   const par=bk.d[pi-1],it=par&&par.items[ii-1];if(!it)return home();
   const prev=par.items[ii-2],next=par.items[ii];
-  root.innerHTML=`<article class="read"><p class="crumb"><a href="#">פרשת השבוע</a> › <a href="#${bk.k}${pi}">${par.name}</a></p><h1>${esc(it.t)}</h1>${tools()}${paras(it.p)}<div class="pn"><span>${prev?`<a href="#${bk.k}${pi}-${ii-1}">→ ${esc(prev.t.slice(0,60))}<small>הקודם</small></a>`:''}</span><span>${next?`<a href="#${bk.k}${pi}-${ii+1}">${esc(next.t.slice(0,60))} ←<small>הבא</small></a>`:''}</span></div></article>`;
+  root.innerHTML=`<article class="read"><p class="crumb"><a href="#">${ui('פרשת השבוע')}</a> › <a href="#${bk.k}${pi}">${portion(par.name)}</a></p><h1 lang="he" dir="rtl">${esc(it.t)}</h1>${tools()}<div lang="he" dir="rtl">${paras(it.p)}</div><div class="pn"><span>${prev?`<a href="#${bk.k}${pi}-${ii-1}">→ ${esc(prev.t.slice(0,60))}<small>${ui('הקודם')}</small></a>`:''}</span><span>${next?`<a href="#${bk.k}${pi}-${ii+1}">${esc(next.t.slice(0,60))} ←<small>${ui('הבא')}</small></a>`:''}</span></div></article>`;
   bindTools(root);
  }
- function route(){const h=location.hash.slice(1);const m=h.match(/^([bs])(\d+)(?:-(\d+))?$/);if(!m)home();else{const bk=books.find(x=>x.k===m[1]);m[3]?article(bk,+m[2],+m[3]):list(bk,+m[2])}top()}
- window.addEventListener('hashchange',route);route();
+ function route(scroll=true){const h=location.hash.slice(1);const m=h.match(/^([bs])(\d+)(?:-(\d+))?$/);if(!m)home();else{const bk=books.find(x=>x.k===m[1]);m[3]?article(bk,+m[2],+m[3]):list(bk,+m[2])}if(scroll)top()}
+ window.addEventListener('hashchange',route);document.addEventListener('site-language-changed',()=>route(false));route();
 }
 
 /* ---------- shut / shira ---------- */
