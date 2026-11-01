@@ -533,3 +533,7 @@ Object.assign(window.SITE_UI_LABELS.fr,{
   "ימים, ביום חמישי": "jours, jeudi",
   "קטגוריה": "Catégorie"
 });
+
+/* Header and accessibility interface translations. */
+Object.assign(window.SITE_UI_LABELS.en,{"שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש \"נר התורה\", בר אילן 9, ירושלים":"Weekly Mesilat Yesharim lesson: Thursdays at 20:30, Ner HaTorah study hall, 9 Bar-Ilan St., Jerusalem","בית מדרש \"נר התורה\"":"Ner HaTorah study hall","חיפוש":"Search","שפת האתר":"Website language","תפריט":"Menu"});
+Object.assign(window.SITE_UI_LABELS.fr,{"שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש \"נר התורה\", בר אילן 9, ירושלים":"Cours hebdomadaire de Messilat Yécharim : jeudi à 20 h 30, beth hamidrach Ner HaTorah, 9 rue Bar-Ilan, Jérusalem","בית מדרש \"נר התורה\"":"Beth hamidrach Ner HaTorah","חיפוש":"Recherche","שפת האתר":"Langue du site","תפריט":"Menu"});
