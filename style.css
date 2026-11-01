@@ -1,18 +1,18 @@
 :root{--blue:#10285c;--blue2:#1b3d86;--gold:#c8a24b;--gold2:#e6cf8f;--ivory:#f8f2e4;--paper:#fffaf0;--terra:#b5532f;--ink:#1c2233;--r:18px}
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
-body{font-family:'Heebo',system-ui,sans-serif;background:var(--ivory);color:var(--ink);line-height:1.75;font-size:17px;direction:rtl}
+body{font-family:'Heebo',system-ui,sans-serif;background:var(--ivory);color:var(--ink);line-height:1.75;font-size:17px}
 h1,h2,h3{font-family:'Frank Ruhl Libre',serif;color:var(--blue);line-height:1.25}
 a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
 .wrap{width:min(1160px,100% - 32px);margin-inline:auto}
 .zel{background-color:var(--blue);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23c8a24b' stroke-opacity='.28' stroke-width='1.2'%3E%3Cpath d='M40 4l9 22 22-9-9 22 22 9-22 9 9 22-22-9-9 22-9-22-22 9 9-22-22-9 22-9-9-22 22 9z'/%3E%3Ccircle cx='40' cy='40' r='9'/%3E%3C/g%3E%3C/svg%3E")}
 /* header */
 header{position:sticky;top:0;z-index:50;background:rgba(16,40,92,.97);backdrop-filter:blur(8px);border-bottom:3px solid var(--gold)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+.nav{display:flex;align-items:center;justify-content:space-between;min-height:70px;flex-wrap:wrap;gap:10px 0;padding:8px 0}
 .brand{display:flex;align-items:center;gap:12px;color:#fff;font-family:'Frank Ruhl Libre',serif;font-size:1.25rem;font-weight:700}
 .brand small{display:block;font-family:Heebo;font-weight:400;font-size:.72rem;color:var(--gold2);letter-spacing:.5px}
 .star{width:36px;height:36px;color:var(--gold)}
-nav ul{display:flex;gap:4px;list-style:none;padding:0}
-nav a{color:#fff;padding:8px 14px;border-radius:999px;font-size:.98rem;transition:.2s}
+nav ul{display:flex;flex-wrap:wrap;gap:4px;row-gap:6px;list-style:none;padding:0}
+nav a{color:#fff;padding:8px 14px;border-radius:999px;font-size:.98rem;white-space:nowrap;transition:.2s}
 nav a:hover,nav a.on{background:var(--gold);color:var(--blue)}
 .burger{display:none;background:none;border:0;color:#fff;font-size:30px;cursor:pointer}
 @media(max-width:860px){.burger{display:block}nav{position:absolute;top:70px;inset-inline:0;background:var(--blue);max-height:0;overflow:hidden;transition:max-height .3s}
@@ -154,6 +154,7 @@ nav .dd.langsw>ul button{display:flex;align-items:center;gap:8px}
 nav .dd.langsw>ul button.on{font-weight:700}
 nav .dd.langsw>ul button.on::after{content:"✓";margin-inline-start:auto}
 nav .dd.langsw>button.dd-trigger{font-size:1.1rem;line-height:1;padding:8px 10px;background:none;border:0;color:inherit;cursor:pointer}
+nav .dd.langsw svg{border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.18);vertical-align:middle;flex:none}
 @media(max-width:1020px){nav a{padding:8px 10px;font-size:.92rem}}
 @media(max-width:860px){nav .dd>ul{display:flex;position:static;box-shadow:none;border:0;background:transparent;padding:0 14px 6px 0;min-width:0}nav .dd>a::after,nav .dd>button.dd-trigger::after{content:""}nav ul{align-items:stretch}}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
@@ -261,7 +262,7 @@ nav a[href="ask.html"]:hover{background:#a37f38}
 #asktab form{display:grid;gap:8px}#asktab input,#asktab textarea{padding:10px 12px;border:1px solid #d9c99a;border-radius:10px;font:inherit;background:#fffdf7;width:100%}
 #asktab .btn{margin:0;cursor:pointer}#asktab .ax{position:absolute;top:6px;inset-inline-end:10px;background:none;border:0;font-size:1.5rem;cursor:pointer;color:#4a5170}
 .tilebar{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:10px}
-.tilebar .chip{border-radius:12px;padding:16px 14px;text-align:right;background:var(--paper);border:1px solid #eadfc2;border-bottom:3px solid var(--gold);font-weight:700;color:var(--blue);margin:0}
+.tilebar .chip{border-radius:12px;padding:16px 14px;text-align:end;background:var(--paper);border:1px solid #eadfc2;border-bottom:3px solid var(--gold);font-weight:700;color:var(--blue);margin:0}
 .tilebar .chip.on{background:var(--blue);color:#fff;border-color:var(--blue);border-bottom-color:var(--gold)}
 @media print{.strip,#asktab,header,footer,.tools,.pn,.newsl{display:none!important}}
 @media(max-width:700px){#asktab{top:auto;bottom:16px;transform:none;inset-inline-start:12px}#asktab .at{writing-mode:horizontal-tb;border-radius:999px!important;padding:11px 18px}#asktab .ap{top:auto;bottom:54px;transform:none;inset-inline-start:0}}
