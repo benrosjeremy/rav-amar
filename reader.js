@@ -2,9 +2,9 @@
 const $=s=>document.querySelector(s);
 // Only site UI is translated; the rabbi's Hebrew source text stays intact.
 const ui=s=>window.siteUi?window.siteUi(s):s;
-const portion=s=>window.sitePortion?window.sitePortion(s):s;
+const portion=s=>{const base=s.replace(/^פרשת\s+/,'');const name=window.sitePortion?window.sitePortion(base):base;return base===s?name:ui('פרשת')+' '+name};
 const bookName=s=>window.siteBook?window.siteBook(s):s;
-const bookLabel=s=>ui('ספר')+' '+bookName(s);
+const bookLabel=s=>(window.siteLanguage&&window.siteLanguage()!=='he')?bookName(s):'ספר '+bookName(s);
 const nik=s=>s.replace(/[֑-ׇ]/g,'').replace(/["״'׳]/g,'').replace(/\s+/g,' ');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function load(names){return Promise.all(names.map(n=>new Promise((res,rej)=>{window.D=window.D||{};if(D[n])return res();const s=document.createElement('script');s.src='data/'+n+'.js';s.onload=res;s.onerror=()=>rej(n);document.head.appendChild(s)})))}
