@@ -1,7 +1,7 @@
 window.I18N = window.I18N || {};
 
 window.I18N.en = {
-_hebrewOnlyNote: "This content is currently available in Hebrew only. The site's menus and main pages can be viewed in English.",
+_hebrewOnlyNote: "The Rabbi's original teachings and titles are presented in Hebrew, their original language. Site navigation and controls are available in English.",
 
 brand: `Rishon LeZion Rabbi Shlomo Moshe Amar<small>Shlita</small>`,
 
@@ -99,7 +99,7 @@ bio_body: `<h2 id="a1">Childhood and Immigration</h2>
 };
 
 window.I18N.fr = {
-_hebrewOnlyNote: "Ce contenu est actuellement disponible uniquement en hébreu. Les menus et les pages principales du site sont disponibles en français.",
+_hebrewOnlyNote: "Les enseignements et les titres originaux du Rabbin sont conservés en hébreu. La navigation et les commandes du site sont disponibles en français.",
 
 brand: `Rishon LeZion, Rabbin Shlomo Moshé Amar<small>Chlita</small>`,
 
