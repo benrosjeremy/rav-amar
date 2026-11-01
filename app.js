@@ -24,7 +24,8 @@ function bookCard(b){return `<article class="book"><div class="cover"><img loadi
 function renderBooks(el,list){el.innerHTML=list.map(bookCard).join('')}
 document.addEventListener('DOMContentLoaded',()=>{
  const burger=document.querySelector('.burger'),nav=document.querySelector('nav');
- burger&&burger.addEventListener('click',()=>nav.classList.toggle('open'));
+ burger&&burger.addEventListener('click',()=>{const opened=nav.classList.toggle('open');burger.setAttribute('aria-expanded',String(opened));});
+ if(burger&&nav){burger.setAttribute('aria-expanded','false');nav.addEventListener('click',e=>{if(e.target.closest('a[href]')){nav.classList.remove('open');burger.setAttribute('aria-expanded','false')}});}
  const here=location.pathname.split('/').pop()||'index.html';
  document.querySelectorAll('nav a').forEach(a=>a.getAttribute('href')===here&&a.classList.add('on'));
  const f=document.getElementById('featured');if(f)renderBooks(f,BOOKS.filter(b=>b.star));
@@ -127,6 +128,9 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
   li.addEventListener('click',function(e){
    var b=e.target.closest('button[data-lang]'); if(!b) return;
    applyLang(b.getAttribute('data-lang'));
+   var nav=document.querySelector('header nav'), burger=document.querySelector('.burger');
+   if(nav) nav.classList.remove('open');
+   if(burger) burger.setAttribute('aria-expanded','false');
   });
  }
  function applyLang(lang){
@@ -145,6 +149,8 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
    if(key==='asktab'&&window.__wireAsktab) window.__wireAsktab(el);
   });
   document.querySelectorAll('.lang-note').forEach(function(n){n.remove()});
+  // Dynamic page content listens to this event and updates only UI labels.
+  document.dispatchEvent(new CustomEvent('site-language-changed',{detail:{lang:lang}}));
   var note=dict&&dict._hebrewOnlyNote;
   if(lang!=='he'&&note){
    ['app','varch','vgrid','pfil'].forEach(function(id){
