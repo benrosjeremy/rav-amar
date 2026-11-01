@@ -24,11 +24,11 @@ async function parasha(){
  const buildIdx=()=>{if(idx)return;idx=[];books.forEach(bk=>bk.d.forEach((par,pi)=>par.items.forEach((it,ii)=>idx.push({h:`${bk.k}${pi+1}-${ii+1}`,t:it.t,par:par.name,nt:nik(it.t),tx:nik(it.p.map(p=>p.t).join(' '))}))))};
  function home(){
   const total=books.reduce((s,b)=>s+b.d.reduce((x,p)=>x+p.items.length,0),0);
-  root.innerHTML=`<div class="search"><input id="q" type="search" placeholder="${ui('חיפוש בדברי התורה (למשל: שבת, תפילה, אמונה)')}" aria-label="חיפוש"><button class="btn" id="go">${ui('חפש')}</button></div><div id="hits" class="hits"></div>`+
+  root.innerHTML=`<div class="search"><input id="q" type="search" placeholder="${ui('חיפוש בדברי התורה (למשל: שבת, תפילה, אמונה)')}" aria-label="${ui('חיפוש')}"><button class="btn" id="go">${ui('חפש')}</button></div><div id="hits" class="hits"></div>`+
   books.map(bk=>`<div class="sec-h"><h2>${bookLabel(bk.name)}</h2><small>${bk.d.reduce((x,p)=>x+p.items.length,0)} ${ui('דברי תורה')}</small></div><div class="tiles">${bk.d.map((p,i)=>`<a class="tile" href="#${bk.k}${i+1}"><b>${portion(p.name)}</b><span>${p.items.length} ${ui('מאמרים')}</span></a>`).join('')}</div>`).join('')+`<p class="note" style="margin-top:34px">${total} ${ui('דברי תורה מפי הרב, מסודרים לפי פרשות השבוע.')}</p>`;
   const q=$('#q'),hits=$('#hits');let t;
   const run=()=>{const v=nik(q.value.trim());if(v.length<2){hits.innerHTML='';return}buildIdx();const res=[];for(const e of idx){if(e.nt.includes(v))res.push([0,e]);else if(e.tx.includes(v))res.push([1,e])}res.sort((a,b)=>a[0]-b[0]);
-   hits.innerHTML=`<p class="note">${res.length?res.length+' '+ui('תוצאות'):ui('לא נמצאו תוצאות')}</p>`+res.slice(0,40).map(([r,e])=>{let sn='';if(r){const i=e.tx.indexOf(v);sn='...'+esc(e.tx.slice(Math.max(0,i-60),i+120))+'...'}return `<a class="hit" href="#${e.h}"><b lang="he" dir="rtl">${esc(e.t)}</b><small>${portion(e.par)}</small>${sn?`<p>${sn}</p>`:''}</a>`}).join('')};
+   hits.innerHTML=`<p class="note">${res.length?res.length+' '+ui('תוצאות'):ui('לא נמצאו תוצאות')}</p>`+res.slice(0,40).map(([r,e])=>{let sn='';if(r){const i=e.tx.indexOf(v);sn='...'+esc(e.tx.slice(Math.max(0,i-60),i+120))+'...'}return `<a class="hit" href="#${e.h}"><b lang="he" dir="rtl">${esc(e.t)}</b><small>${portion(e.par)}</small>${sn?`<p lang="he" dir="rtl">${sn}</p>`:''}</a>`}).join('')};
   q.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(run,250)});$('#go').addEventListener('click',run);
  }
  function list(bk,pi){
