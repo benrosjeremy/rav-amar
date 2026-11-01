@@ -109,7 +109,10 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
   var here=location.pathname.split('/').pop()||'index.html';
   document.querySelectorAll('nav a').forEach(function(a){a.classList.toggle('on', a.getAttribute('href')===here)});
  }
- var LANGS=[['he','🇮🇱','עברית'],['en','🇬🇧','English'],['fr','🇫🇷','Français']];
+ var FLAG_IL='<svg viewBox="0 0 30 20" width="20" height="14" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><rect y="2" width="30" height="2.3" fill="#0038b8"/><rect y="15.7" width="30" height="2.3" fill="#0038b8"/><polygon points="15,4 20.2,13 9.8,13" fill="none" stroke="#0038b8" stroke-width="1.1"/><polygon points="15,16 9.8,7 20.2,7" fill="none" stroke="#0038b8" stroke-width="1.1"/></svg>';
+ var FLAG_GB='<svg viewBox="0 0 30 20" width="20" height="14" aria-hidden="true"><rect width="30" height="20" fill="#012169"/><line x1="0" y1="0" x2="30" y2="20" stroke="#fff" stroke-width="6"/><line x1="30" y1="0" x2="0" y2="20" stroke="#fff" stroke-width="6"/><line x1="0" y1="0" x2="30" y2="20" stroke="#C8102E" stroke-width="2.4"/><line x1="30" y1="0" x2="0" y2="20" stroke="#C8102E" stroke-width="2.4"/><rect x="12" width="6" height="20" fill="#fff"/><rect y="7" width="30" height="6" fill="#fff"/><rect x="13" width="4" height="20" fill="#C8102E"/><rect y="8" width="30" height="4" fill="#C8102E"/></svg>';
+ var FLAG_FR='<svg viewBox="0 0 30 20" width="20" height="14" aria-hidden="true"><rect width="30" height="20" fill="#ED2939"/><rect width="20" height="20" fill="#fff"/><rect width="10" height="20" fill="#002395"/></svg>';
+ var LANGS=[['he',FLAG_IL,'עברית'],['en',FLAG_GB,'English'],['fr',FLAG_FR,'Français']];
  function buildSwitcher(lang){
   document.querySelectorAll('.langsw').forEach(function(e){e.remove()});
   var ul=document.querySelector('header nav ul');
