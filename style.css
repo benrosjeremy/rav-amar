@@ -195,9 +195,18 @@ mark{background:#f3e3a8;color:inherit;border-radius:3px;padding:0 2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chips span{background:#f3ead2;border-radius:999px;padding:4px 14px;font-size:.9rem}
 .page-h{padding:38px 0 46px}
 
-.tl{list-style:none;margin:18px 0 0;padding:0 24px 0 0;border-right:2px solid var(--gold)}
+.tl{list-style:none;margin:18px 0 0;padding-inline-end:24px;border-inline-start:2px solid var(--gold)}
 .tl li{position:relative;padding:0 0 16px;display:flex;gap:14px;align-items:baseline}
-.tl li:before{content:"";position:absolute;right:-31px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--ivory);border:2px solid var(--gold)}
+.tl li:before{content:"";position:absolute;inset-inline-start:-31px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--ivory);border:2px solid var(--gold)}
+/* ---- i18n (language switcher + LTR support) ---- */
+nav ul li.langsw{display:flex;gap:4px;align-items:center;padding-inline-start:8px}
+.langsw button{font:700 .82rem Heebo,sans-serif;background:none;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 11px;cursor:pointer;transition:.2s}
+.langsw button.on{background:var(--gold);color:var(--blue);border-color:var(--gold)}
+.langsw button:hover{border-color:var(--gold)}
+@media(max-width:860px){nav ul li.langsw{padding:10px 0 0;border-top:1px solid rgba(255,255,255,.18);margin-top:6px}}
+.lang-note{background:#f3ead2;border:1px solid #e3d2a0;border-inline-start:4px solid var(--terra);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.92rem;color:#4a5170}
+html[dir="ltr"] #app,html[dir="ltr"] #varch,html[dir="ltr"] #vgrid,html[dir="ltr"] #pfil,html[dir="ltr"] #dvar,html[dir="ltr"] #gal,html[dir="ltr"] #featured,html[dir="ltr"] #allbooks,html[dir="ltr"] #bar,html[dir="ltr"] #board{direction:rtl}
+html[dir="ltr"] .lang-note{direction:ltr;text-align:left}
 .tl b{font-family:'Frank Ruhl Libre',serif;color:var(--terra);font-size:1.15rem;min-width:52px}
 .tl span{color:var(--blue)}
 

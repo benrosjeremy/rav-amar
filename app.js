@@ -74,10 +74,13 @@ document.addEventListener('DOMContentLoaded',()=>{
  const hd=hdate(n);const st=document.createElement('div');st.className='strip';
  st.innerHTML=`<div class="wrap"><span>יום ${days[n.getDay()]}, ${hd?hd+' · ':''}${n.getDate()} ב${MON[n.getMonth()]} ${n.getFullYear()}</span><span class="sl">שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש "נר התורה", בר אילן 9, ירושלים</span></div>`;
  document.body.insertBefore(st,document.body.firstChild);
- if(!document.querySelector('.newsl')){const ft=document.querySelector('footer');if(ft){const s=document.createElement('section');s.style.paddingTop='10px';s.innerHTML='<div class="wrap"><form class="newsl"><div><h2>דבר תורה למייל</h2><p>הצטרפו לרשימת התפוצה וקבלו מדי שבוע דבר תורה מהרב, יחד עם מועד השיעור הקרוב.</p></div><div class="nf"><input type="text" placeholder="שם מלא" aria-label="שם מלא"><input type="email" placeholder="כתובת אימייל" aria-label="אימייל"><button class="btn" type="submit">הרשמה</button></div></form></div>';ft.parentNode.insertBefore(s,ft);s.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<div><h3>תודה!</h3><p>זהו אתר הדגמה, ההרשמה לא נשלחה.</p></div>'})}}
- if(!document.getElementById('asktab')){const w=document.createElement('div');w.id='asktab';w.innerHTML=`<button class="at" aria-expanded="false">שאל את הרב</button><div class="ap" hidden><button class="ax" aria-label="סגירה">×</button><h3>שאל את הרב</h3><p>שאלה בהלכה או בענייני יומיום? שלחו, והתשובה תתפרסם בדף השו"ת.</p><form><input placeholder="שם" aria-label="שם"><input type="email" placeholder="אימייל" aria-label="אימייל"><input placeholder="נושא השאלה" aria-label="נושא"><textarea rows="4" placeholder="השאלה (עד 600 מילים)" aria-label="השאלה"></textarea><button class="btn" type="submit">שליחה</button></form></div>`;document.body.appendChild(w);
+ if(!document.querySelector('.newsl')){const ft=document.querySelector('footer');if(ft){const s=document.createElement('section');s.style.paddingTop='10px';s.innerHTML='<div class="wrap"><form class="newsl" data-i18n-region="newsletter"><div><h2>דבר תורה למייל</h2><p>הצטרפו לרשימת התפוצה וקבלו מדי שבוע דבר תורה מהרב, יחד עם מועד השיעור הקרוב.</p></div><div class="nf"><input type="text" placeholder="שם מלא" aria-label="שם מלא"><input type="email" placeholder="כתובת אימייל" aria-label="אימייל"><button class="btn" type="submit">הרשמה</button></div></form></div>';ft.parentNode.insertBefore(s,ft);s.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<div><h3>תודה!</h3><p>זהו אתר הדגמה, ההרשמה לא נשלחה.</p></div>'})}}
+ window.__wireAsktab=function(w){
   const ap=w.querySelector('.ap'),at=w.querySelector('.at'),tg=o=>{ap.hidden=!o;at.setAttribute('aria-expanded',o)};at.onclick=()=>tg(ap.hidden);w.querySelector('.ax').onclick=()=>tg(false);
-  w.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<p><b>תודה!</b> זהו אתר הדגמה, השאלה לא נשלחה.</p>'})}
+  w.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<p><b>תודה!</b> זהו אתר הדגמה, השאלה לא נשלחה.</p>'})
+ };
+ if(!document.getElementById('asktab')){const w=document.createElement('div');w.id='asktab';w.setAttribute('data-i18n-region','asktab');w.innerHTML=`<button class="at" aria-expanded="false">שאל את הרב</button><div class="ap" hidden><button class="ax" aria-label="סגירה">×</button><h3>שאל את הרב</h3><p>שאלה בהלכה או בענייני יומיום? שלחו, והתשובה תתפרסם בדף השו"ת.</p><form><input placeholder="שם" aria-label="שם"><input type="email" placeholder="אימייל" aria-label="אימייל"><input placeholder="נושא השאלה" aria-label="נושא"><textarea rows="4" placeholder="השאלה (עד 600 מילים)" aria-label="השאלה"></textarea><button class="btn" type="submit">שליחה</button></form></div>`;document.body.appendChild(w);
+  window.__wireAsktab(w)}
  const ta=document.querySelector('main textarea, .wrap form textarea');if(document.body.dataset.page==='ask'&&ta){const c=document.createElement('small');c.style.cssText='display:block;color:#6a7190;margin-top:4px';c.textContent='0 / 600 מילים';ta.after(c);ta.addEventListener('input',()=>{const w=(ta.value.trim().match(/\S+/g)||[]).length;c.textContent=w+' / 600 מילים';c.style.color=w>600?'#b5532f':'#6a7190'})}
 });})();
 /* ---- in-page video player ---- */
@@ -94,4 +97,62 @@ function open(id,title){if(!dlg)build();const st=dlg.querySelector('.vm-stage');
  document.addEventListener('securitypolicyviolation',onv,{once:true});
  st.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${(title||'').replace(/"/g,'')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;setTimeout(()=>document.removeEventListener('securitypolicyviolation',onv),3000)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube.com/watch"]');if(!a||e.metaKey||e.ctrlKey)return;const id=yid(a.href);if(!id)return;e.preventDefault();const t=(a.querySelector('h3,h2,span:not(.tag):not(.vk)')||a).textContent.trim().slice(0,120);open(id,t)},true);
+})();
+
+/* ---- i18n: optional English / French interface (Hebrew stays the source of truth) ---- */
+(function(){
+ var LS='site_lang';
+ function getLang(){try{return localStorage.getItem(LS)||'he'}catch(e){return 'he'}}
+ function setLang(l){try{localStorage.setItem(LS,l)}catch(e){}}
+ var ORIG=new Map();
+ function highlightNav(){
+  var here=location.pathname.split('/').pop()||'index.html';
+  document.querySelectorAll('nav a').forEach(function(a){a.classList.toggle('on', a.getAttribute('href')===here)});
+ }
+ function buildSwitcher(lang){
+  document.querySelectorAll('.langsw').forEach(function(e){e.remove()});
+  var ul=document.querySelector('header nav ul');
+  if(!ul) return;
+  var li=document.createElement('li');
+  li.className='langsw';
+  li.innerHTML='<button type="button" data-lang="he">עברית</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button>';
+  ul.appendChild(li);
+  li.querySelectorAll('button').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-lang')===lang)});
+  li.addEventListener('click',function(e){
+   var b=e.target.closest('button'); if(!b) return;
+   applyLang(b.getAttribute('data-lang'));
+  });
+ }
+ function applyLang(lang){
+  setLang(lang);
+  var html=document.documentElement;
+  html.setAttribute('lang', lang==='he'?'he':lang);
+  html.setAttribute('dir', lang==='he'?'rtl':'ltr');
+  document.body.classList.remove('lang-he','lang-en','lang-fr');
+  document.body.classList.add('lang-'+lang);
+  var dict=(window.I18N&&window.I18N[lang])||null;
+  document.querySelectorAll('[data-i18n-region]').forEach(function(el){
+   if(!ORIG.has(el)) ORIG.set(el, el.innerHTML);
+   var key=el.getAttribute('data-i18n-region');
+   if(lang==='he'||!dict||!dict[key]) el.innerHTML=ORIG.get(el);
+   else el.innerHTML=dict[key];
+   if(key==='asktab'&&window.__wireAsktab) window.__wireAsktab(el);
+  });
+  document.querySelectorAll('.lang-note').forEach(function(n){n.remove()});
+  var note=dict&&dict._hebrewOnlyNote;
+  if(lang!=='he'&&note){
+   ['app','varch','vgrid','pfil'].forEach(function(id){
+    var c=document.getElementById(id);
+    if(c&&c.parentNode){
+     var n=document.createElement('div');
+     n.className='lang-note';
+     n.textContent=note;
+     c.parentNode.insertBefore(n,c);
+    }
+   });
+  }
+  buildSwitcher(lang);
+  highlightNav();
+ }
+ document.addEventListener('DOMContentLoaded',function(){ applyLang(getLang()); });
 })();
