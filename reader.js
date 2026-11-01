@@ -61,7 +61,7 @@ async function flat(key,opts){
  function article(i){const it=d[i-1];if(!it)return home();const prev=d[i-2],next=d[i];
   root.innerHTML=`<article class="read"><p class="crumb"><a href="#">${ui(opts.title)}</a></p><h1 lang="he" dir="rtl">${esc(it.t)}</h1>${tools()}<div lang="he" dir="rtl">${paras(it.p,opts.poem?'poem':'')}</div><div class="pn"><span>${prev?`<a href="#${opts.p}${i-1}">→ ${esc(prev.t.slice(0,60))}<small>${ui('הקודם')}</small></a>`:''}</span><span>${next?`<a href="#${opts.p}${i+1}">${esc(next.t.slice(0,60))} ←<small>${ui('הבא')}</small></a>`:''}</span></div></article>`;bindTools(root)}
  function route(){const m=location.hash.slice(1).match(new RegExp('^'+opts.p+'(\\d+)$'));m?article(+m[1]):home();top()}
- window.addEventListener('hashchange',route);route();
+ window.addEventListener('hashchange',route);document.addEventListener('site-language-changed',route);route();
 }
 
 /* ---------- video archive: playlists with thumbnails ---------- */
