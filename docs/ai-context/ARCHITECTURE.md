@@ -37,3 +37,10 @@
 - עברית/אנגלית/צרפתית: תפריט, פוטר, טפסים, LTR/RTL, מובייל וגדלי 320–1024px.
 - וידאו: מודל, חסימת embed, טעינת thumbnails ומצב ללא נתוני רשת.
 - SEO: canonical, robots, sitemap, preview ותאימות לתוכן האמיתי.
+
+## שכבת ממשק רב־לשונית — תוספות PR #9 (ממתין למיזוג)
+- `data/i18n.js` מכיל `window.SITE_UI_LABELS`, `window.SITE_PORTION_NAMES`, `window.SITE_BOOK_NAMES` ו־`window.siteUi/sitePortion/siteBook`. המילונים מיועדים **לממשק ולתוכן עריכתי באתר בלבד**, לא ליצירות הרב.
+- `app.js` מגדיר `site-language-changed` בעת החלפת שפה. רכיבים שנבנים ב־JavaScript (`reader.js`, ספרים, סרטונים, לוח שיעורים) מקשיבים לאירוע ומציירים מחדש את תוויות הממשק.
+- `reader.js` שומר את הטקסט המקורי של הרב ואת מזהי הקישורים/האינדקס, ומבדיל בין תוויות חיפוש/פרשות/קטגוריות לבין `it.t` ו־`it.p`. טקסט הרב מקבל `lang=he, dir=rtl`.
+- שליחת טופסי ההדגמה מזוהה באמצעות מאזין `submit` מואצל (delegated), כי ה־HTML של הטפסים מוחלף בעת שינוי שפה. יש להחליפו בעת חיבור backend אמיתי.
+- `tests/i18n-contract.test.cjs` ו־`.github/workflows/i18n-smoke.yml` מכילים בדיקות Node ללא תלויות. אין הן תחליף ל־E2E בדפדפן אמיתי.

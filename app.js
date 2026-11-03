@@ -1,4 +1,7 @@
 const CDN='img/';
+const ui=s=>window.siteUi?window.siteUi(s):s;
+const siteLocale=()=>window.siteLanguage?window.siteLanguage():'he';
+const localizedDate=value=>new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':siteLocale()==='en'?'en-GB':'he-IL',{day:'numeric',month:'long',year:'numeric'}).format(new Date(value+'T12:00:00'));
 const BOOKS=[
 {t:'שו"ת שמע שלמה – 10 כרכים',c:'shut',p:429,d:'חיבורו המרכזי של הרב: שאלות ותשובות ופסקי דינים בארבעת חלקי השולחן ערוך. מהדורה חדשה תשפ"ד.',i:'shema10.jpg',star:1},
 {t:'שו"ת כרם שלמה (ב כרכים)',c:'shut',p:80,d:'על זרעים והלכות כלליות הנוהגות בהתיישבות החקלאית.',i:'14015778_45078083e4b8d765fdb4e4fd209f2f85.jpg'},
@@ -20,29 +23,28 @@ const BOOKS=[
 {t:'מלאכת שלמה – סדר חליצה',c:'halacha',p:58,d:'סדר החליצה על פי השולחן ערוך, עם ביאור וליקוט תשובות.',i:'14011397_614f3421b4f2c3dc83302f64ff0edddd.jpg'}
 ];
 const CATS={all:'הכול',shut:'שו"ת',musar:'מוסר ושיעורים',torah:'פרשת השבוע',halacha:'הלכה'};
-function bookCard(b){return `<article class="book"><div class="cover"><img loading="lazy" src="${CDN+b.i}" alt="${b.t}" onerror="this.outerHTML='<div class=ph>${b.t}</div>'"></div><div class="info"><h3>${b.t}</h3><p>${b.d}</p><span class="price">${b.p} ₪</span></div></article>`}
+function bookCard(b){return `<article class="book"><div class="cover"><img loading="lazy" src="${CDN+b.i}" alt="${b.t}" onerror="this.outerHTML='<div class=ph>${b.t}</div>'"></div><div class="info"><h3 lang="he" dir="rtl">${b.t}</h3><p>${ui(b.d)}</p><span class="price">${b.p} ₪</span></div></article>`}
 function renderBooks(el,list){el.innerHTML=list.map(bookCard).join('')}
 document.addEventListener('DOMContentLoaded',()=>{
  const burger=document.querySelector('.burger'),nav=document.querySelector('nav');
- burger&&burger.addEventListener('click',()=>nav.classList.toggle('open'));
+ burger&&burger.addEventListener('click',()=>{const opened=nav.classList.toggle('open');burger.setAttribute('aria-expanded',String(opened));});
+ if(burger&&nav){burger.setAttribute('aria-expanded','false');nav.addEventListener('click',e=>{if(e.target.closest('a[href]')){nav.classList.remove('open');burger.setAttribute('aria-expanded','false')}});}
  const here=location.pathname.split('/').pop()||'index.html';
  document.querySelectorAll('nav a').forEach(a=>a.getAttribute('href')===here&&a.classList.add('on'));
- const f=document.getElementById('featured');if(f)renderBooks(f,BOOKS.filter(b=>b.star));
+ const f=document.getElementById('featured');if(f){const drawFeaturedBooks=()=>renderBooks(f,BOOKS.filter(b=>b.star));drawFeaturedBooks();document.addEventListener('site-language-changed',drawFeaturedBooks)}
  const all=document.getElementById('allbooks');
- if(all){const bar=document.getElementById('bar');
-  bar.innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==='all'?'on':''}" data-k="${k}">${v}</button>`).join('');
-  renderBooks(all,BOOKS);
-  bar.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;bar.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===e.target));renderBooks(all,k==='all'?BOOKS:BOOKS.filter(b=>b.c===k))})}
- document.querySelectorAll('form').forEach(fm=>fm.addEventListener('submit',e=>{e.preventDefault();fm.innerHTML='<div class="card"><h3>תודה!</h3><p>זהו אתר הדגמה, ההודעה לא נשלחה. בגרסה הסופית היא תגיע ללשכת הרב.</p></div>'}));
+ if(all){const bar=document.getElementById('bar');let current='all';
+  const redraw=()=>{bar.innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k===current?'on':''}" data-k="${k}">${ui(v)}</button>`).join('');renderBooks(all,current==='all'?BOOKS:BOOKS.filter(b=>b.c===current))};
+  bar.addEventListener('click',e=>{const k=e.target.closest('[data-k]')?.dataset.k;if(!k)return;current=k;redraw()});redraw();document.addEventListener('site-language-changed',redraw)}
+ 
 });
 
 const VIDEOS=[{"id": "U8xjGuIOKZk", "d": "2026-10-23", "k": "full", "t": "פרשת לך-לך תשפ״ז", "s": "גדלות הרב אלפנרי והרב יהודא צדקה, הגדול מחבירו"}, {"id": "coobljIJqj4", "d": "2026-10-22", "k": "full", "t": "פרשת וירא תשפ״ז", "s": "שיעורו השבועי של מרן"}, {"id": "ToO9yVuKfF0", "d": "2026-10-22", "k": "hl", "t": "רגעי שיא, לך-לך תשפ״ז", "s": "סיפורים על הרב אלפנרי והרב יהודא צדקה זצוק״ל"}, {"id": "Ji_swjTUW1w", "d": "2026-10-16", "k": "full", "t": "פרשת נח תשפ״ז", "s": "זיכוי הרבים, ומה יכול האדם להפסיד"}, {"id": "q0Abg5KwiwM", "d": "2026-10-15", "k": "hl", "t": "רגעי שיא, פרשת נח תשפ״ז", "s": "זיכוי הרבים, ומה יכול האדם להפסיד"}, {"id": "3VvOoDvzh-g", "d": "2026-10-09", "k": "full", "t": "פרשת בראשית תשפ״ז", "s": "סיפורים על מרן הרב עובדיה יוסף זצוקללה״ה"}, {"id": "Az2rpRV5qM0", "d": "2026-10-08", "k": "hl", "t": "רגעי שיא, פרשת בראשית תשפ״ז", "s": "סיפורים על מרן הרב עובדיה יוסף זצוקללה״ה"}, {"id": "opHbBM3vuCQ", "d": "2026-09-24", "k": "full", "t": "ערב סוכות תשפ״ז", "s": "שיעורו השבועי של מרן"}, {"id": "wE0lFhV6QbU", "d": "2026-09-24", "k": "hl", "t": "רגעי שיא, ערב סוכות תשפ״ז", "s": "מצות השמחה בחג הסוכות"}, {"id": "zKUD-RlxzDw", "d": "2026-09-24", "k": "pre", "t": "שיעור מקדים", "s": "הרב דניאל לוי שליט״א"}, {"id": "4kM4SEQ_CfA", "d": "2026-09-18", "k": "full", "t": "שבת שובה, פרשת האזינו תשפ״ז", "s": "הכנה ליום הכיפורים: למחול לחבירו"}, {"id": "8HGOnRNtanE", "d": "2026-09-17", "k": "hl", "t": "רגעי שיא, שבת שובה תשפ״ז", "s": "הכנה ליום הכיפורים: למחול לחבירו"}, {"id": "TRxHUY8EeiI", "d": "2026-09-11", "k": "full", "t": "ערב ראש השנה תשפ״ז", "s": "ניצול הזמן בראש השנה"}, {"id": "-aF6_noadmI", "d": "2026-09-10", "k": "hl", "t": "רגעי שיא, ערב ראש השנה תשפ״ז", "s": "ניצול הזמן בראש השנה"}, {"id": "bWbILUStAF4", "d": "2026-09-04", "k": "full", "t": "ניצבים-וילך תשפ״ו", "s": "הכנה לראש השנה: שינוי במעשים"}];
 const KINDS={all:'הכול',full:'שיעורים מלאים',hl:'רגעי שיא',pre:'שיעורים מקדימים'};
 const MON=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-function vCard(v){const [y,m,d]=v.d.split('-');return `<a class="vcard" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener"><div class="vplay">${(window.D&&D.thumbs&&D.thumbs[v.id])?`<img src="${D.thumbs[v.id]}" alt="" width="256" height="144"><i class="pb"></i>`:''}<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M10 90V40a50 50 0 0 1 100 0v50z" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/><circle cx="60" cy="48" r="22" fill="#b8934a"/><path d="M53 38l18 10-18 10z" fill="#fff"/></svg><span class="vk">${KINDS[v.k]}</span></div><div class="vbody"><time>${+d} ${MON[+m-1]} ${y}</time><h3>${v.t}</h3><p>${v.s}</p><b class="vgo">לצפייה ביוטיוב ←</b></div></a>`}
+function vCard(v){const [y,m,d]=v.d.split('-');return `<a class="vcard" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener"><div class="vplay">${(window.D&&D.thumbs&&D.thumbs[v.id])?`<img src="${D.thumbs[v.id]}" alt="" width="256" height="144"><i class="pb"></i>`:''}<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M10 90V40a50 50 0 0 1 100 0v50z" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/><circle cx="60" cy="48" r="22" fill="#b8934a"/><path d="M53 38l18 10-18 10z" fill="#fff"/></svg><span class="vk">${ui(KINDS[v.k])}</span></div><div class="vbody"><time>${localizedDate(v.d)}</time><h3 dir="auto">${v.t}</h3><p dir="auto">${v.s}</p><b class="vgo">${ui('לצפייה ביוטיוב ←')}</b></div></a>`}
 document.addEventListener('DOMContentLoaded',()=>{const g=document.getElementById('vgrid');if(!g)return;const bar=document.getElementById('vbar');
-bar.innerHTML=Object.entries(KINDS).map(([k,v])=>`<button class="chip ${k==='all'?'on':''}" data-k="${k}">${v}</button>`).join('');
-let cur='all';const draw=k=>{cur=k;g.innerHTML=(k==='all'?VIDEOS:VIDEOS.filter(v=>v.k===k)).map(vCard).join('')};draw('all');const sc=document.createElement('script');sc.src='data/thumbs.js';sc.onload=()=>draw(cur);document.head.appendChild(sc);
+let cur='all';const draw=k=>{cur=k;bar.innerHTML=Object.entries(KINDS).map(([id,name])=>`<button class="chip ${id===cur?'on':''}" data-k="${id}">${ui(name)}</button>`).join('');g.innerHTML=(k==='all'?VIDEOS:VIDEOS.filter(v=>v.k===k)).map(vCard).join('')};draw('all');document.addEventListener('site-language-changed',()=>draw(cur));const sc=document.createElement('script');sc.src='data/thumbs.js';sc.onload=()=>draw(cur);document.head.appendChild(sc);
 bar.addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;bar.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===e.target));draw(k)})});
 
 document.addEventListener('DOMContentLoaded',()=>{const g=document.getElementById('gal');if(!g)return;const d=document.createElement('dialog');d.className='lb';d.innerHTML='<img alt="">';document.body.appendChild(d);
@@ -53,16 +55,19 @@ document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementByI
  const MONS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
  const n=new Date(),dt=new Date(n);dt.setHours(20,30,0,0);let add=(4-n.getDay()+7)%7;if(add===0&&n>dt)add=7;dt.setDate(n.getDate()+add);
  const days=Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);
- const when=days===0?'היום, בשעה 20:30':days===1?'מחר, בשעה 20:30':`בעוד ${days} ימים, ביום חמישי ${dt.getDate()} ב${MONS[dt.getMonth()]}`;
+ const schedule=()=>{if(days===0)return ui('היום, בשעה 20:30');if(days===1)return ui('מחר, בשעה 20:30');
+  if(siteLocale()==='he')return `בעוד ${days} ימים, ביום חמישי ${dt.getDate()} ב${MONS[dt.getMonth()]}`;
+  const date=new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':'en-GB',{weekday:'long',day:'numeric',month:'long'}).format(dt);
+  return siteLocale()==='fr'?`Dans ${days} jours, ${date} à 20 h 30`:`In ${days} days, ${date} at 20:30`};
  const full=VIDEOS.filter(v=>v.k==='full'),main=full[0]||VIDEOS[0],hl=VIDEOS.find(v=>v.k==='hl')||VIDEOS[1],prev=full[1]||VIDEOS[2];
  const render=()=>{const T=(window.D&&D.thumbs15)||{};const img=id=>T[id]?`<img src="${T[id]}" alt="" width="256" height="144">`:'';
  const yt=id=>`https://www.youtube.com/watch?v=${id}`;
- b.innerHTML=`<a class="bmain" href="${yt(main.id)}" target="_blank" rel="noopener"><div class="bth">${img(main.id)}<i class="pb"></i></div><div class="bt"><span class="tag"><b>שיעור שבועי</b> | מסילת ישרים</span><h2>${main.t}</h2><p>${main.s}</p><span class="bgo">לצפייה בשיעור ←</span></div></a>
- <div class="bside"><div class="bit next"><span class="tag"><b>השיעור הבא</b> | בית מדרש "נר התורה"</span><h3>${when}</h3><p>בר אילן 9, ירושלים. השידור והשיעורים מתפרסמים בערוץ היוטיוב.</p></div>
- <a class="bit" href="${yt(hl.id)}" target="_blank" rel="noopener"><span class="tag"><b>רגעי שיא</b></span><h3>${hl.t}</h3><p>${hl.s}</p></a>
- <a class="bit" href="${yt(prev.id)}" target="_blank" rel="noopener"><span class="tag"><b>שיעור קודם</b></span><h3>${prev.t}</h3><p>${prev.s}</p></a>
- <a class="bit" href="parasha.html"><span class="tag"><b>דברי תורה</b> | פרשת השבוע</span><h3>מאות דברי תורה על בראשית ושמות</h3><p>עם חיפוש לפי נושא וקריאה בגופן מתכוונן.</p></a></div>`};
- render();const sc=document.createElement('script');sc.src='data/thumbs15.js';sc.onload=render;document.head.appendChild(sc)});
+ b.innerHTML=`<a class="bmain" href="${yt(main.id)}" target="_blank" rel="noopener"><div class="bth">${img(main.id)}<i class="pb"></i></div><div class="bt"><span class="tag"><b>${ui('שיעור שבועי')}</b> | ${ui('מסילת ישרים')}</span><h2 dir="auto">${main.t}</h2><p dir="auto">${main.s}</p><span class="bgo">${ui('לצפייה בשיעור ←')}</span></div></a>
+ <div class="bside"><div class="bit next"><span class="tag"><b>${ui('השיעור הבא')}</b> | ${ui('בית מדרש "נר התורה"')}</span><h3>${schedule()}</h3><p>${ui('בר אילן 9, ירושלים. השידור והשיעורים מתפרסמים בערוץ היוטיוב.')}</p></div>
+ <a class="bit" href="${yt(hl.id)}" target="_blank" rel="noopener"><span class="tag"><b>${ui('רגעי שיא')}</b></span><h3 dir="auto">${hl.t}</h3><p dir="auto">${hl.s}</p></a>
+ <a class="bit" href="${yt(prev.id)}" target="_blank" rel="noopener"><span class="tag"><b>${ui('שיעור קודם')}</b></span><h3 dir="auto">${prev.t}</h3><p dir="auto">${prev.s}</p></a>
+ <a class="bit" href="parasha.html"><span class="tag"><b>${ui('דברי תורה')}</b> | ${ui('פרשת השבוע')}</span><h3>${ui('מאות דברי תורה על בראשית ושמות')}</h3><p>${ui('עם חיפוש לפי נושא וקריאה בגופן מתכוונן.')}</p></a></div>`};
+ render();document.addEventListener('site-language-changed',render);const sc=document.createElement('script');sc.src='data/thumbs15.js';sc.onload=render;document.head.appendChild(sc)});
 
 /* ---- global: date strip, ask tab, newsletter ---- */
 (function(){
@@ -72,12 +77,17 @@ function hdate(d){try{const p=Object.fromEntries(new Intl.DateTimeFormat('he-u-c
 document.addEventListener('DOMContentLoaded',()=>{
  const n=new Date(),days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],MON=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
  const hd=hdate(n);const st=document.createElement('div');st.className='strip';
- st.innerHTML=`<div class="wrap"><span>יום ${days[n.getDay()]}, ${hd?hd+' · ':''}${n.getDate()} ב${MON[n.getMonth()]} ${n.getFullYear()}</span><span class="sl">שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש "נר התורה", בר אילן 9, ירושלים</span></div>`;
+ const drawStrip=()=>{
+  const date=siteLocale()==='he'? `יום ${days[n.getDay()]}, ${hd?hd+' · ':''}${n.getDate()} ב${MON[n.getMonth()]} ${n.getFullYear()}`:
+   new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(n);
+  st.innerHTML='<div class="wrap"><span>'+date+'</span><span class="sl">'+ui('שיעור שבועי במסילת ישרים: ימי חמישי ב-20:30, בית מדרש "נר התורה", בר אילן 9, ירושלים')+'</span></div>';
+ };
+ drawStrip();document.addEventListener('site-language-changed',drawStrip);
  document.body.insertBefore(st,document.body.firstChild);
- if(!document.querySelector('.newsl')){const ft=document.querySelector('footer');if(ft){const s=document.createElement('section');s.style.paddingTop='10px';s.innerHTML='<div class="wrap"><form class="newsl" data-i18n-region="newsletter"><div><h2>דבר תורה למייל</h2><p>הצטרפו לרשימת התפוצה וקבלו מדי שבוע דבר תורה מהרב, יחד עם מועד השיעור הקרוב.</p></div><div class="nf"><input type="text" placeholder="שם מלא" aria-label="שם מלא"><input type="email" placeholder="כתובת אימייל" aria-label="אימייל"><button class="btn" type="submit">הרשמה</button></div></form></div>';ft.parentNode.insertBefore(s,ft);s.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<div><h3>תודה!</h3><p>זהו אתר הדגמה, ההרשמה לא נשלחה.</p></div>'})}}
+ if(!document.querySelector('.newsl')){const ft=document.querySelector('footer');if(ft){const s=document.createElement('section');s.style.paddingTop='10px';s.innerHTML='<div class="wrap"><form class="newsl" data-i18n-region="newsletter"><div><h2>דבר תורה למייל</h2><p>הצטרפו לרשימת התפוצה וקבלו מדי שבוע דבר תורה מהרב, יחד עם מועד השיעור הקרוב.</p></div><div class="nf"><input type="text" placeholder="שם מלא" aria-label="שם מלא"><input type="email" placeholder="כתובת אימייל" aria-label="אימייל"><button class="btn" type="submit">הרשמה</button></div></form></div>';ft.parentNode.insertBefore(s,ft);}}
  window.__wireAsktab=function(w){
   const ap=w.querySelector('.ap'),at=w.querySelector('.at'),tg=o=>{ap.hidden=!o;at.setAttribute('aria-expanded',o)};at.onclick=()=>tg(ap.hidden);w.querySelector('.ax').onclick=()=>tg(false);
-  w.querySelector('form').addEventListener('submit',e=>{e.preventDefault();e.target.innerHTML='<p><b>תודה!</b> זהו אתר הדגמה, השאלה לא נשלחה.</p>'})
+  
  };
  if(!document.getElementById('asktab')){const w=document.createElement('div');w.id='asktab';w.setAttribute('data-i18n-region','asktab');w.innerHTML=`<button class="at" aria-expanded="false">שאל את הרב</button><div class="ap" hidden><button class="ax" aria-label="סגירה">×</button><h3>שאל את הרב</h3><p>שאלה בהלכה או בענייני יומיום? שלחו, והתשובה תתפרסם בדף השו"ת.</p><form><input placeholder="שם" aria-label="שם"><input type="email" placeholder="אימייל" aria-label="אימייל"><input placeholder="נושא השאלה" aria-label="נושא"><textarea rows="4" placeholder="השאלה (עד 600 מילים)" aria-label="השאלה"></textarea><button class="btn" type="submit">שליחה</button></form></div>`;document.body.appendChild(w);
   window.__wireAsktab(w)}
@@ -120,13 +130,16 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
   var cur=LANGS.filter(function(l){return l[0]===lang})[0]||LANGS[0];
   var li=document.createElement('li');
   li.className='dd langsw';
-  li.innerHTML='<button type="button" class="dd-trigger" aria-label="שפה">'+cur[1]+'</button><ul>'+LANGS.map(function(l){
+  li.innerHTML='<button type="button" class="dd-trigger" aria-label="'+ui('שפת האתר')+'">'+cur[1]+'</button><ul>'+LANGS.map(function(l){
    return '<li><button type="button" data-lang="'+l[0]+'" class="'+(l[0]===lang?'on':'')+'">'+l[1]+' '+l[2]+'</button></li>';
   }).join('')+'</ul>';
   ul.appendChild(li);
   li.addEventListener('click',function(e){
    var b=e.target.closest('button[data-lang]'); if(!b) return;
    applyLang(b.getAttribute('data-lang'));
+   var nav=document.querySelector('header nav'), burger=document.querySelector('.burger');
+   if(nav) nav.classList.remove('open');
+   if(burger) burger.setAttribute('aria-expanded','false');
   });
  }
  function applyLang(lang){
@@ -145,6 +158,8 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
    if(key==='asktab'&&window.__wireAsktab) window.__wireAsktab(el);
   });
   document.querySelectorAll('.lang-note').forEach(function(n){n.remove()});
+  // Dynamic page content listens to this event and updates only UI labels.
+  document.dispatchEvent(new CustomEvent('site-language-changed',{detail:{lang:lang}}));
   var note=dict&&dict._hebrewOnlyNote;
   if(lang!=='he'&&note){
    ['app','varch','vgrid','pfil'].forEach(function(id){
@@ -162,3 +177,13 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href*="youtube
  }
  document.addEventListener('DOMContentLoaded',function(){ applyLang(getLang()); });
 })();
+
+// Intercept all demo forms, including forms recreated after a language change.
+document.addEventListener('submit',e=>{
+ const form=e.target;if(!form || !form.matches || !form.matches('form'))return;
+ e.preventDefault();
+ const msg=form.classList.contains('newsl')? 'זהו אתר הדגמה, ההרשמה לא נשלחה.':
+   form.closest('#asktab')?'זהו אתר הדגמה, השאלה לא נשלחה.':
+   'זהו אתר הדגמה, ההודעה לא נשלחה. בגרסה הסופית היא תגיע ללשכת הרב.';
+ form.innerHTML='<div role="status" class="card"><h3>'+ui('תודה!')+'</h3><p>'+ui(msg)+'</p></div>';
+});
