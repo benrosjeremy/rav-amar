@@ -51,6 +51,13 @@ contact_about: `<h3>About This Site</h3><p style="margin-top:8px">In response to
 
 videos_chanbar: `<div><h2>The "Mesilat Yesharim" Channel</h2><p>The Rabbi's weekly lesson takes place every Thursday at 20:30. Here are the latest videos from the official channel.</p></div><a class="btn" href="https://www.youtube.com/@masilatysarim" target="_blank" rel="noopener">View the full channel on YouTube</a>`,
 
+videos_latest: `<h2>Latest Videos</h2>`,
+videos_archive: `<h2>Playlists &amp; Lecture Archive</h2><small>Playlists from the channel, open on YouTube</small>`,
+home_dvar_title: `Torah Thoughts`,
+home_gallery_title: `Photo Gallery`,
+home_newbooks_title: `New Books`,
+home_allbooks: `All Books`,
+
 asktab: `<button class="at" aria-expanded="false">Ask the Rabbi</button><div class="ap" hidden><button class="ax" aria-label="Close">×</button><h3>Ask the Rabbi</h3><p>A question of Jewish law or an everyday matter? Send it, and the answer will be published on the Responsa page.</p><form><input placeholder="Name" aria-label="Name"><input type="email" placeholder="Email" aria-label="Email"><input placeholder="Subject" aria-label="Subject"><textarea rows="4" placeholder="Your question (up to 600 words)" aria-label="Your question"></textarea><button class="btn" type="submit">Send</button></form></div>`,
 
 bio_toc: `<a href="#a1">Childhood and Immigration</a><a href="#a2">In the Beit Midrash</a><a href="#a2b">His Family</a><a href="#a3">Community Rabbi and Dayan</a><a href="#a4">Military Service</a><a href="#a5">Chief Rabbi of Tel Aviv-Jaffa</a><a href="#a6">Rishon LeZion</a><a href="#a7">Chief Rabbi of Jerusalem</a><a href="#a8">His Rulings</a><a href="#a9">His Writings</a><a href="#a10">His Character</a><a href="#a11">Timeline</a>`,
@@ -148,6 +155,13 @@ contact_form: `<input required placeholder="Nom complet"><input type="tel" place
 contact_about: `<h3>À propos de ce site</h3><p style="margin-top:8px">Face aux demandes répétées visant à rendre accessible au public l'enseignement et la pensée du Rabbin, ses élèves et ceux qui suivent son enseignement ont décidé de créer ce portail pour le bénéfice du public, sans but lucratif. Le site documente les œuvres du Rabbin, des cours vidéo, des articles et des décisions halakhiques, et offre la possibilité de contacter le Rabbin pour une demande de conseil et de bénédiction, ou pour poser des questions de Halakha.</p><p>Puisse la Présence divine reposer sur notre ouvrage, et puissions-nous mériter de magnifier et d'exalter la Torah, « car la terre sera remplie de la connaissance de l'Éternel, comme les eaux recouvrent le fond de la mer ».</p>`,
 
 videos_chanbar: `<div><h2>La chaîne « Mesilat Yesharim »</h2><p>Le cours hebdomadaire du Rabbin a lieu chaque jeudi à 20h30. Voici les dernières vidéos de la chaîne officielle.</p></div><a class="btn" href="https://www.youtube.com/@masilatysarim" target="_blank" rel="noopener">Voir toute la chaîne YouTube</a>`,
+
+videos_latest: `<h2>Dernières vidéos</h2>`,
+videos_archive: `<h2>Playlists et archive des cours</h2><small>Playlists de la chaîne, s'ouvrent sur YouTube</small>`,
+home_dvar_title: `Paroles de Torah`,
+home_gallery_title: `Galerie de photos`,
+home_newbooks_title: `Nouveaux livres`,
+home_allbooks: `Tous les livres`,
 
 asktab: `<button class="at" aria-expanded="false">Poser une question</button><div class="ap" hidden><button class="ax" aria-label="Fermer">×</button><h3>Poser une question au Rabbin</h3><p>Une question de Halakha ou de la vie quotidienne ? Envoyez-la, et la réponse sera publiée sur la page Questions-réponses.</p><form><input placeholder="Nom" aria-label="Nom"><input type="email" placeholder="E-mail" aria-label="E-mail"><input placeholder="Sujet" aria-label="Sujet"><textarea rows="4" placeholder="Votre question (600 mots maximum)" aria-label="Votre question"></textarea><button class="btn" type="submit">Envoyer</button></form></div>`,
 
@@ -349,6 +363,7 @@ window.SITE_PORTION_NAMES={
     "משפטים": "Mishpatim",
     "תרומה": "Terumah",
     "תצוה": "Tetzaveh",
+    "תצווה": "Tetzaveh",
     "כי תשא": "Ki Tisa",
     "ויקהל": "Vayakhel",
     "פקודי": "Pekudei",
@@ -402,6 +417,7 @@ window.SITE_PORTION_NAMES={
     "משפטים": "Michpatim",
     "תרומה": "Térouma",
     "תצוה": "Tétsavé",
+    "תצווה": "Tétsavé",
     "כי תשא": "Ki Tissa",
     "ויקהל": "Vayakhel",
     "פקודי": "Pékoudé",

@@ -1,4 +1,5 @@
 const CDN='img/';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ui=s=>window.siteUi?window.siteUi(s):s;
 const siteLocale=()=>window.siteLanguage?window.siteLanguage():'he';
 const localizedDate=value=>new Intl.DateTimeFormat(siteLocale()==='fr'?'fr-FR':siteLocale()==='en'?'en-GB':'he-IL',{day:'numeric',month:'long',year:'numeric'}).format(new Date(value+'T12:00:00'));
@@ -23,7 +24,7 @@ const BOOKS=[
 {t:'מלאכת שלמה – סדר חליצה',c:'halacha',p:58,d:'סדר החליצה על פי השולחן ערוך, עם ביאור וליקוט תשובות.',i:'14011397_614f3421b4f2c3dc83302f64ff0edddd.jpg'}
 ];
 const CATS={all:'הכול',shut:'שו"ת',musar:'מוסר ושיעורים',torah:'פרשת השבוע',halacha:'הלכה'};
-function bookCard(b){return `<article class="book"><div class="cover"><img loading="lazy" src="${CDN+b.i}" alt="${b.t}" onerror="this.outerHTML='<div class=ph>${b.t}</div>'"></div><div class="info"><h3 lang="he" dir="rtl">${b.t}</h3><p>${ui(b.d)}</p><span class="price">${b.p} ₪</span></div></article>`}
+function bookCard(b){return `<article class="book"><div class="cover"><img loading="lazy" src="${CDN+b.i}" alt="${esc(b.t)}" onerror="this.outerHTML='<div class=ph>${esc(b.t)}</div>'"></div><div class="info"><h3 lang="he" dir="rtl">${esc(b.t)}</h3><p>${ui(b.d)}</p><span class="price">${b.p} ₪</span></div></article>`}
 function renderBooks(el,list){el.innerHTML=list.map(bookCard).join('')}
 document.addEventListener('DOMContentLoaded',()=>{
  const burger=document.querySelector('.burger'),nav=document.querySelector('nav');
